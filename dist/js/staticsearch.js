@@ -275,9 +275,6 @@ var StaticSearch = class _StaticSearch {
 };
 var staticsearch = new StaticSearch();
 await staticsearch.init();
-console.log("-------------------");
-console.log(await staticsearch.search("Hello. This is a search for Craig Buckler - a web developer."));
-console.log(await staticsearch.search("seo"));
 export {
   staticsearch
 };

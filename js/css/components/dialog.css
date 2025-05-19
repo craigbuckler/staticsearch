@@ -1,0 +1,20 @@
+html { scrollbar-gutter: stable; }
+
+html:has(dialog[open]) {
+	overflow: hidden;
+}
+
+dialog {
+  inline-size: 100%;
+  block-size: 100%;
+  max-inline-size: calc(100dvw - (2 * var(--staticsearch-dialog-margin)));
+  max-block-size: calc(100dvh - (2 * var(--staticsearch-dialog-margin)));
+  margin: auto;
+  padding: var(--staticsearch-dialog-padding);
+  border: var(--staticsearch-dialog-border) solid;
+}
+
+dialog::backdrop {
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(6px);
+}

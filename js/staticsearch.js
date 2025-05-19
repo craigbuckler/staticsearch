@@ -177,7 +177,7 @@ class StaticSearch {
 
 
   // load and store a word index
-  async loadIndex(word) {
+  async loadIndex( word ) {
 
     if (!this.#ready) {
       throw new Error('StaticSearch failed to initialize');
@@ -271,8 +271,3 @@ class StaticSearch {
 const staticsearch = new StaticSearch();
 await staticsearch.init();
 export { staticsearch };
-
-// testing
-console.log('-------------------');
-console.log( await staticsearch.search('Hello. This is a search for Craig Buckler - a web developer.') );
-console.log( await staticsearch.search('seo') );

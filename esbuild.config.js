@@ -19,8 +19,8 @@ await deletePath(outdir);
 // bundle JS
 const buildJS = await esbuild.context({
 
-  entryPoints: ['./js/staticsearch.js', './stem/*'],
-  external: ['./stem/*'],
+  entryPoints: ['./js/*', './stem/*'],
+  external: ['./__SSDIR__/*', './stem/*'],
   format: 'esm',
   platform: 'browser',
   bundle: true,
@@ -36,3 +36,29 @@ const buildJS = await esbuild.context({
 // build
 await buildJS.rebuild();
 buildJS.dispose();
+
+
+// bundle CSS
+const buildCSS = await esbuild.context({
+
+  entryPoints: ['./js/css/*'],
+  external: ['/images/*'],
+  bundle: true,
+  target,
+  loader: {
+    '.woff2': 'file',
+    '.png': 'file',
+    '.jpg': 'file',
+    '.svg': 'dataurl'
+  },
+  logLevel,
+  minify,
+  sourcemap,
+  outdir: `${ outdir }css/`,
+
+});
+
+
+// single build
+await buildCSS.rebuild();
+buildCSS.dispose();

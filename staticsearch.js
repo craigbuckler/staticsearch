@@ -13,7 +13,7 @@ class StaticSearch {
 
   // configuration defaults
   #agent = 'staticsearch';
-  #clientJS = 'staticsearch.js';
+  #clientJS = ['staticsearch.js', 'staticsearch-component.js'];
   #wordIndexChars = 2;
   #JSONspacing = '  ';
 
@@ -257,7 +257,6 @@ class StaticSearch {
       this.#JSONspacing )
     );
 
-
     // copy stem files
     const wSearchDirStem = join(workingSearchDir, './stem/');
     await cp(join(workingStaticSite, './dist/stem/'), wSearchDirStem, { recursive: true, force: true } );
@@ -265,15 +264,25 @@ class StaticSearch {
     // get stem file
     const stemImport = await stemFilename(wSearchDirStem, this.language);
 
-    // copy and modify #staticsearch.js client code
-    const clientJS = (await readFile( join(workingStaticSite, './dist/js/', this.#clientJS), { encoding: 'utf8' } ))
-      .replaceAll('__STEMFILE__', stemImport)
-      .replaceAll('__AGENT__', this.#agent)
-      .replaceAll('__FILENAME__', this.#clientJS)
-      .replaceAll('__VERSION__', Math.ceil( +new Date() / 60000))
-      .replaceAll('__WORDCROP__', this.wordCrop);
+    // copy and modify client code
+    Promise.allSettled(
+      this.#clientJS.map( async jsFile => {
 
-    await writePath(join(workingSearchDir, this.#clientJS), clientJS);
+        const clientJS = (await readFile( join(workingStaticSite, './dist/js/', jsFile), { encoding: 'utf8' } ))
+          .replaceAll('__SSDIR__/', '')
+          .replaceAll('__STEMFILE__', stemImport)
+          .replaceAll('__AGENT__', this.#agent)
+          .replaceAll('__FILENAME__', jsFile)
+          .replaceAll('__VERSION__', Math.ceil( +new Date() / 60000))
+          .replaceAll('__WORDCROP__', this.wordCrop);
+
+        await writePath(join(workingSearchDir, jsFile), clientJS);
+
+      })
+    );
+
+    // copy CSS files
+    await cp(join(workingStaticSite, './dist/css/'), join(workingSearchDir, './css/'), { recursive: true, force: true } );
 
     performance.mark('write index files:end');
 
