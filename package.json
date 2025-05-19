@@ -33,21 +33,22 @@
   },
   "license": "MIT",
   "author": "Craig Buckler",
-    "funding": {
+  "funding": {
     "type": "individual",
     "url": "https://github.com/sponsors/craigbuckler"
   },
   "scripts": {
     "build.dev": "NODE_ENV=development node ./esbuild.config.js",
     "build": "node ./esbuild.config.js",
+    "prepublishOnly": "npm run build",
     "start": "node ./index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "node-html-parser": "7.0.1",
-    "porter2": "1.0.3"
+    "node-html-parser": "7.0.1"
   },
   "devDependencies": {
-    "esbuild": "0.25.4"
+    "esbuild": "0.25.4",
+    "pixdb": "1.0.2"
   }
 }

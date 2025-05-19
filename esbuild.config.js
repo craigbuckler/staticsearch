@@ -8,7 +8,7 @@ const
   target = 'chrome130,firefox130,safari17'.split(','),
   logLevel = isDev ? 'info' : 'error',
   minify = !isDev,
-  sourcemap = isDev && 'linked',
+  sourcemap = false, // isDev && 'linked',
   outdir = './dist/';
 
 console.log(`JS client bundle ${ isDev ? 'development' : 'production'} mode`);
@@ -19,11 +19,12 @@ await deletePath(outdir);
 // bundle JS
 const buildJS = await esbuild.context({
 
-  entryPoints: ['./js/#search.js'],
+  entryPoints: ['./js/staticsearch.js', './stem/*'],
+  external: ['./stem/*'],
   format: 'esm',
+  platform: 'browser',
   bundle: true,
   target,
-  external: [],
   drop: isDev ? [] : ['debugger', 'console'],
   logLevel,
   minify,
@@ -32,16 +33,6 @@ const buildJS = await esbuild.context({
 
 });
 
-if (isDev) {
-
-  // watch for file changes
-  await buildJS.watch();
-
-}
-else {
-
-  // single build
-  await buildJS.rebuild();
-  buildJS.dispose();
-
-}
+// build
+await buildJS.rebuild();
+buildJS.dispose();

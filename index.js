@@ -18,7 +18,10 @@ const
     { env: 'PAGE_DOMSELECTORS',     cli: 'dom',             prop: 'pageDOMSelectors',       type: 'nodelist',   help: 'comma-separated content DOM nodes (\'main\')' },
     { env: 'SITE_PARSEROBOTSFILE',  cli: 'robotfile',       prop: 'siteParseRobotsFile',    type: 'true|false', help: 'parse robot.txt Disallows (true)' },
     { env: 'SITE_PARSEROBOTSMETA',  cli: 'robotmeta',       prop: 'siteParseRobotsMeta',    type: 'true|false', help: 'parse robot meta noindex (true)' },
-    { env: 'WORD_CROP',             cli: 'wordCrop',        prop: 'wordCrop',               type: 'int',        help: 'indexed maximum word length (7)' },
+    { env: 'LANGUAGE',              cli: 'language',        prop: 'language',               type: 'str',        help: 'language (en)' },
+    { env: 'WORDCROP',              cli: 'wordcrop',        prop: 'wordCrop',               type: 'num',        help: 'crop word letters (7)' },
+    { env: 'STOPWORDS',             cli: 'stopwords',       prop: 'stopWords',              type: 'str',        help: 'comma-separated list of stop words (\'\')' },
+    { env: 'WEIGHT_LINK',           cli: 'weightlink',      prop: 'wordWeight.link',        type: 'num',        help: 'word weight for inbound links (5)' },
     { env: 'WEIGHT_TITLE',          cli: 'weighttitle',     prop: 'wordWeight.title',       type: 'num',        help: 'word weight for main title (10)' },
     { env: 'WEIGHT_DESCRIPTION',    cli: 'weightdesc',      prop: 'wordWeight.description', type: 'num',        help: 'word weight for description (8)' },
     { env: 'WEIGHT_H2',             cli: 'weighth2',        prop: 'wordWeight.h2',          type: 'num',        help: 'word weight for H2 headings (6)' },
@@ -26,10 +29,9 @@ const
     { env: 'WEIGHT_H4',             cli: 'weighth4',        prop: 'wordWeight.h4',          type: 'num',        help: 'word weight for H4 headings (4)' },
     { env: 'WEIGHT_H5',             cli: 'weighth5',        prop: 'wordWeight.h5',          type: 'num',        help: 'word weight for H5 headings (3)' },
     { env: 'WEIGHT_H6',             cli: 'weighth6',        prop: 'wordWeight.h6',          type: 'num',        help: 'word weight for H6 headings (2)' },
-    { env: 'WEIGHT_CONTENT',        cli: 'weightcontent',   prop: 'wordWeight.content',     type: 'num',        help: 'word weight for content (1)' },
-    { env: 'WEIGHT_EMPHASIS',       cli: 'weightemphasis',  prop: 'wordWeight.emphasis',    type: 'num',        help: 'word weight for emphasis (1)' },
+    { env: 'WEIGHT_EMPHASIS',       cli: 'weightemphasis',  prop: 'wordWeight.emphasis',    type: 'num',        help: 'word weight for bold and italic (2)' },
     { env: 'WEIGHT_ALT',            cli: 'weightalt',       prop: 'wordWeight.alt',         type: 'num',        help: 'word weight for alt tags (1)' },
-    { env: 'WEIGHT_LINK',           cli: 'weightlink',      prop: 'wordWeight.link',        type: 'num',        help: 'word weight for inbound links (5)' },
+    { env: 'WEIGHT_CONTENT',        cli: 'weightcontent',   prop: 'wordWeight.content',     type: 'num',        help: 'word weight for content (1)' },
     { env: null,                    cli: 'v',               prop: null,                     type: null,         help: 'show application version' },
     { env: null,                    cli: 'version',         prop: null,                     type: null,         help: 'show application version' },
     { env: null,                    cli: '?',               prop: null,                     type: null,         help: 'show help' },
@@ -101,6 +103,7 @@ Load using:
 Note that CLI arguments take precedence over environment variables.
 `);
 
+  process.exit(0);
 }
 
 
@@ -121,6 +124,7 @@ Example code:
   staticsearch.buildDir = './dest/';
   staticsearch.searchDir = './dest/index/';
   staticsearch.buildRoot = './blog/';
+  staticsearch.wordWeight.title = 20;
 
   // run index
   await staticsearch.index();
@@ -132,6 +136,7 @@ ${ config.filter(c => c.prop).map(c => `  staticsearch.${ (c.prop + (c.type ? ' 
 When a value is not defined, staticsearch uses environment variables where available.
 `);
 
+  process.exit(0);
 }
 
 

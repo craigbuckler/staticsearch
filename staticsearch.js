@@ -1,10 +1,11 @@
 import process from 'node:process';
 import { readdir, readFile, cp } from 'node:fs/promises';
-import { join, dirname, extname, sep } from 'node:path';
+import { join, resolve, dirname, extname, sep } from 'node:path';
 import { performance } from 'node:perf_hooks';
 
 import { parseRobotsTxt, parseHTML } from './lib/parser.js';
 import { writePath, deletePath } from './lib/file.js';
+import { stemFilename, stemFunction, stopWords } from './lib/lang.js';
 import { log } from './lib/log.js';
 
 // search indexer
@@ -12,9 +13,13 @@ class StaticSearch {
 
   // configuration defaults
   #agent = 'staticsearch';
+  #clientJS = 'staticsearch.js';
   #wordIndexChars = 2;
-  #JSONspacing = '';
+  #JSONspacing = '  ';
 
+  language = process.env.LOCALE;
+  wordCrop = process.env.WORDCROP;
+  stopWords = process.env.STOPWORDS;
   buildDir = process.env.BUILD_DIR || './build/';
   searchDir = process.env.SEARCH_DIR || './build/search/';
   buildRoot = process.env.BUILD_ROOT || '/';
@@ -26,8 +31,6 @@ class StaticSearch {
 
   pageDOMSelectors = (process.env.PAGE_DOMSELECTORS || 'main').split(',').map(v => v.trim());
 
-  wordCrop = parseFloat(process.env.WORD_CROP  || 7);
-
   wordWeight = {
     title:        parseFloat(process.env.WEIGHT_TITLE  || 10),
     description:  parseFloat(process.env.WEIGHT_DESCRIPTION || 8),
@@ -37,7 +40,7 @@ class StaticSearch {
     h5:           parseFloat(process.env.WEIGHT_H5 || 3),
     h6:           parseFloat(process.env.WEIGHT_H6 || 2),
     content:      parseFloat(process.env.WEIGHT_CONTENT || 1),
-    emphasis:     parseFloat(process.env.WEIGHT_EMPHASIS || 1),
+    emphasis:     parseFloat(process.env.WEIGHT_EMPHASIS || 2),
     alt:          parseFloat(process.env.WEIGHT_ALT || 1),
     link:         parseFloat(process.env.WEIGHT_LINK || 5)
   };
@@ -47,21 +50,35 @@ class StaticSearch {
 
     performance.mark('total indexing time:start');
 
+    // resolved working directories
+    const
+      workingBuildDir = resolve(process.cwd(), this.buildDir),
+      workingSearchDir = resolve(process.cwd(), this.searchDir),
+      workingStaticSite = resolve( '/', dirname( import.meta.url.replace(/^[^/]*\/+/, '') ) );
+
+    // set language, stem and stopword
+    this.language = (this.language || 'en').trim().toLowerCase();
+    this.wordCrop = Math.max(3, parseFloat(this.wordCrop) || 7);
+
+    const
+      stem = await stemFunction(this.language),
+      stopword = await stopWords(this.language, this.wordCrop, this.stopWords);
+
     // parse robots.txt
     const robotsIgnore = await parseRobotsTxt(
-      join(this.buildDir, 'robots.txt'),
+      join(workingBuildDir, 'robots.txt'),
       this.#agent,
       this.siteParseRobotsFile
     );
 
     // find all HTML files and slugs
-    let buildFile = (await readdir(this.buildDir, { recursive: true }))
+    let buildFile = (await readdir(workingBuildDir, { recursive: true }))
       .filter(f => extname(f).toLowerCase().includes('.htm'))
       .map(file => {
 
         // determine full filename and slug
         let slug = join( this.buildRoot, file );
-        file = join(this.buildDir, file);
+        file = join(workingBuildDir, file);
 
         if (slug.endsWith( this.siteIndexFile )) {
           slug = dirname(slug);
@@ -100,6 +117,8 @@ class StaticSearch {
           this.siteDomain,        // domain
           buildFile[idx].slug,    // slug
           this.siteIndexFile,     // index filename
+          stem,                   // stem function
+          stopword,               // stopword list
           this.wordCrop           // max word letters
         );
 
@@ -118,7 +137,7 @@ class StaticSearch {
     buildFile = buildFile.filter(f => f.html);
 
     if (!buildFile.length) {
-      log(`no files available for indexing at ${ this.buildDir }`);
+      log(`no files available for indexing at ${ workingBuildDir }`);
       return;
     }
 
@@ -149,7 +168,7 @@ class StaticSearch {
       addWords( page.html.word.content, idx, this.wordWeight.content );
 
       // emphasis scores
-      addWords( page.html.word.emphasis, idx, this.wordWeight.emphasis );
+      addWords( page.html.word.emphasis, idx, this.wordWeight.emphasis - this.wordWeight.content );
 
       // alt scores
       addWords( page.html.word.alt, idx, this.wordWeight.alt );
@@ -157,7 +176,7 @@ class StaticSearch {
       // headings
       for (let h = 2; h <= 6; h++) {
         const hN = 'h' + h;
-        addWords( page.html.word[hN], idx, this.wordWeight[hN] );
+        addWords( page.html.word[hN], idx, this.wordWeight[hN] - this.wordWeight.content );
       }
 
       // inbound links
@@ -184,7 +203,7 @@ class StaticSearch {
     performance.mark('write index files:start');
 
     // output index files
-    await deletePath(this.searchDir);
+    await deletePath(workingSearchDir);
 
     const
       wordList = [...wordIndex.keys()].sort(),
@@ -216,7 +235,7 @@ class StaticSearch {
             wordOut[w] = Object.fromEntries( wordIndex.get(w) );
           });
 
-          await writePath(join(this.searchDir, curFile + '.json'), JSON.stringify( wordOut, null, this.#JSONspacing ));
+          await writePath(join(workingSearchDir, './data/', curFile + '.json'), JSON.stringify( wordOut, null, this.#JSONspacing ));
 
         }
 
@@ -228,19 +247,33 @@ class StaticSearch {
     }
 
     // page indexes
-    await writePath(join(this.searchDir, '#index.json'), JSON.stringify(
+    await writePath(join(workingSearchDir, 'index.json'), JSON.stringify(
       {
-        indexed: +new Date(),
-        crop: this.wordCrop,
         page: pageIndex,
-        word: wordFileList
+        file: wordFileList,
+        stopword: [...stopword]
       },
       null,
       this.#JSONspacing )
     );
 
-    // copy client-side JS
-    await cp('./dist/', this.searchDir, { recursive: true, force: true } );
+
+    // copy stem files
+    const wSearchDirStem = join(workingSearchDir, './stem/');
+    await cp(join(workingStaticSite, './dist/stem/'), wSearchDirStem, { recursive: true, force: true } );
+
+    // get stem file
+    const stemImport = await stemFilename(wSearchDirStem, this.language);
+
+    // copy and modify #staticsearch.js client code
+    const clientJS = (await readFile( join(workingStaticSite, './dist/js/', this.#clientJS), { encoding: 'utf8' } ))
+      .replaceAll('__STEMFILE__', stemImport)
+      .replaceAll('__AGENT__', this.#agent)
+      .replaceAll('__FILENAME__', this.#clientJS)
+      .replaceAll('__VERSION__', Math.ceil( +new Date() / 60000))
+      .replaceAll('__WORDCROP__', this.wordCrop);
+
+    await writePath(join(workingSearchDir, this.#clientJS), clientJS);
 
     performance.mark('write index files:end');
 
