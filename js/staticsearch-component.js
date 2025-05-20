@@ -24,7 +24,7 @@ class StaticSearchWebComponent extends HTMLElement {
   // component connected
   connectedCallback() {
 
-    // append styles
+    // load styles
     const link = document.createElement('link');
     link.rel = 'stylesheet';
     link.href = `${StaticSearchWebComponent.path}css/component.css`;
@@ -87,6 +87,7 @@ class StaticSearchWebComponent extends HTMLElement {
     const dialog = document.createElement('dialog');
 
     dialog.innerHTML = `
+      <form method="dialog"><button class="close"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path xmlns="http://www.w3.org/2000/svg" fill="currentColor" d="M5.3 5.3a1 1 0 0 1 1.4 0l5.3 5.3 5.3-5.3a1 1 0 1 1 1.4 1.4L13.4 12l5.3 5.3a1 1 0 0 1-1.4 1.4L12 13.4l-5.3 5.3a1 1 0 0 1-1.4-1.4l5.3-5.3-5.3-5.3a1 1 0 0 1 0-1.4Z"/></svg></button></form>
       <search>
         <label for="search">${ this.getAttribute('label') || 'search' }</label>
         <input type="search" id="search" name="q" minlength="2" maxlength="300" />

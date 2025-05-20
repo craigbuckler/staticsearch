@@ -11,5 +11,5 @@
   --staticsearch-margin: 3vmin;
   --staticsearch-padding: 2vmin;
 
-  --staticsearch-box: 5.5em;
+  --staticsearch-box: calc(3em + (2 * var(--staticsearch-padding)));
 }

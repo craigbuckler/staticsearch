@@ -4,133 +4,162 @@ html:has(dialog[open]) {
 	overflow: hidden;
 }
 
-dialog {
-  position: absolute;
-  inline-size: var(--staticsearch-width);
-  block-size: 100%;
-  max-inline-size: calc(100dvw - (2 * var(--staticsearch-margin)));
-  max-block-size: calc(100dvh - (2 * var(--staticsearch-margin)));
-  margin: auto;
-  padding: 0;
-  color: var(--staticsearch-fore);
-  background-color: var(--staticsearch-back);
-  border: 1px solid var(--staticsearch-border);
-  border-radius: 5px;
-  box-shadow: 0 2px 4px #000;
-  overflow: hidden;
-  transform-origin: 50% 0;
+static-search {
 
-  &, &::backdrop {
-    transition: all 0.3s ease-in-out;
-    transition-behavior: allow-discrete;
-  }
+  cursor: pointer;
 
-  &[open] {
+  dialog {
+    position: absolute;
+    inline-size: var(--staticsearch-width);
+    block-size: 100%;
+    max-inline-size: calc(100dvw - (2 * var(--staticsearch-margin)));
+    max-block-size: calc(100dvh - (2 * var(--staticsearch-margin)));
+    margin: auto;
+    padding: 0;
+    color: var(--staticsearch-fore);
+    background-color: var(--staticsearch-back);
+    border: 1px solid var(--staticsearch-border);
+    border-radius: 5px;
+    box-shadow: 0 2px 4px #000;
+    overflow: hidden;
+    cursor: auto;
+    transform-origin: 50% 0;
 
-    opacity: 1;
-    transform: none;
+    &, &::backdrop {
+      transition: all 0.3s ease-in-out;
+      transition-behavior: allow-discrete;
+    }
 
-    @starting-style {
-      display: block;
-      opacity: 0.5;
+    &[open] {
+
+      opacity: 1;
+      transform: none;
+
+      @starting-style {
+        display: block;
+        opacity: 0.5;
+        transform:
+          scaleX(0.9)
+          scaleY(0);
+      }
+
+      &::backdrop {
+        opacity: 1;
+        background: var(--staticsearch-backdrop);
+        backdrop-filter: blur(3px);
+
+        @starting-style {
+          opacity: 0;
+          backdrop-filter: blur(0);
+        }
+
+      }
+
+    }
+
+    &:not([open]) {
+      display: none;
+      opacity: 0;
       transform:
         scaleX(0.9)
         scaleY(0);
     }
 
-    &::backdrop {
-      opacity: 1;
-      background: var(--staticsearch-backdrop);
-      backdrop-filter: blur(3px);
+  }
 
-      @starting-style {
-        opacity: 0;
-        backdrop-filter: blur(0);
-      }
+  button.close {
+    position: absolute;
+    inset-inline-end: 0;
+    inset-block-start: 0;
+    block-size: 1.5em;
+    inline-size: 1.5em;
+    min-block-size: unset;
+    min-inline-size: unset;
+    padding: 0;
+    margin: 0;
+    color: var(--staticsearch-fore);
+    background-color: var(--staticsearch-back);
+    border: 0 none;
+    cursor: pointer;
+    z-index: 3;
+  }
 
+  button.close:is(:hover, :focus, :active) {
+    color: var(--staticsearch-link);
+    background-color: var(--staticsearch-back);
+  }
+
+  search {
+    position: absolute;
+    block-size: var(--staticsearch-box);
+    inset-inline: 0;
+    inset-block-start: 0;
+    padding: var(--staticsearch-padding);
+    padding-block-end: 0;
+    background-color: inherit;
+    box-shadow: 0 2px 3px var(--staticsearch-backdrop);
+    overflow: hidden;
+    z-index: 2;
+
+    &:focus-within {
+      label { color: var(--staticsearch-link); }
+      input { border-color: var(--staticsearch-link); }
     }
-
   }
 
-  &:not([open]) {
-    display: none;
-    opacity: 0;
-    transform:
-      scaleX(0.9)
-      scaleY(0);
+  label {
+    display: block;
+    font-size: 0.85em;
+    padding-inline-start: 8px;
+    padding-block-end: 2px;
   }
 
-}
-
-search {
-  position: absolute;
-  block-size: var(--staticsearch-box);
-  inset-inline: 0;
-  inset-block-start: 0;
-  padding: var(--staticsearch-padding);
-  padding-block-end: 0;
-  background-color: inherit;
-  box-shadow: 0 2px 3px var(--staticsearch-backdrop);
-  overflow: hidden;
-  z-index: 2;
-
-  &:focus-within {
-    label { color: var(--staticsearch-link); }
-    input { border-color: var(--staticsearch-link); }
+  input {
+    display: block;
+    width: 100%;
+    background-color: inherit;
+    padding-block: 3px;
+    padding-inline: 8px;
+    line-height: 1.4;
+    border: 1px solid var(--staticsearch-border);
+    border-radius: 3px;
+    outline-style: none;
   }
-}
 
-label {
-  display: block;
-  font-size: 0.85em;
-  padding-inline-start: 8px;
-  padding-block-end: 2px;
-}
+  #search-results {
+    position: absolute;
+    inset-inline: 0;
+    inset-block: 0;
+    inset-block-start: var(--staticsearch-box);
+    padding: var(--staticsearch-padding);
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
 
-input {
-  display: block;
-  width: 100%;
-  background-color: inherit;
-  padding-block: 3px;
-  padding-inline: 8px;
-  line-height: 1.4;
-  border: 1px solid var(--staticsearch-border);
-  border-radius: 3px;
-  outline-style: none;
-}
+  h2, p, ol {
+    font-size: 1em;
+    margin: 0;
+  }
 
-#search-results {
-  position: absolute;
-  inset-inline: 0;
-  inset-block: 0;
-  inset-block-start: var(--staticsearch-box);
-  padding: var(--staticsearch-padding);
-  overflow-x: hidden;
-  overflow-y: auto;
-}
+  li {
+    margin-block: 1.5em;
+    margin-inline-start: 2em;
+    color: var(--staticsearch-link);
+  }
 
-h2, p, ol {
-  font-size: 1em;
-  margin: 0;
-}
+  a {
+    display: block;
+  }
 
-li {
-  margin-block: 1.5em;
-  margin-inline-start: 2em;
-  color: var(--staticsearch-link);
-}
+  h2 {
+    font-weight: bolder;
+    color: inherit;
+  }
 
-a {
-  display: block;
-}
+  p.description {
+    font-size: 0.85em;
+    margin: 0;
+    color: var(--staticsearch-forelight);
+  }
 
-h2.title {
-  font-weight: bolder;
-  color: inherit;
-}
-
-p.description {
-  font-size: 0.85em;
-  margin: 0;
-  color: var(--staticsearch-forelight);
 }
