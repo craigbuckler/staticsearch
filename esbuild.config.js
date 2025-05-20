@@ -8,7 +8,7 @@ const
   target = 'chrome130,firefox130,safari17'.split(','),
   logLevel = isDev ? 'info' : 'error',
   minify = !isDev,
-  sourcemap = false, // isDev && 'linked',
+  sourcemap = false,
   outdir = './dist/';
 
 console.log(`JS client bundle ${ isDev ? 'development' : 'production'} mode`);
@@ -33,11 +33,6 @@ const buildJS = await esbuild.context({
 
 });
 
-// build
-await buildJS.rebuild();
-buildJS.dispose();
-
-
 // bundle CSS
 const buildCSS = await esbuild.context({
 
@@ -58,7 +53,9 @@ const buildCSS = await esbuild.context({
 
 });
 
-
 // single build
+await buildJS.rebuild();
+buildJS.dispose();
+
 await buildCSS.rebuild();
 buildCSS.dispose();

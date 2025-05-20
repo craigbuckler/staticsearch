@@ -1,7 +1,1 @@
-// stem/stem.js
-function stem(word) {
-  return word;
-}
-export {
-  stem
-};
+function e(t){return t}export{e as stem};

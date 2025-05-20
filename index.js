@@ -3,7 +3,7 @@ import process from 'node:process';
 import pkg from './package.json' with { type: 'json' };
 
 import { parseCliArgs } from './lib/parser.js';
-import { staticsearch } from './staticsearch.js';
+import { staticsearch } from './indexer.js';
 
 
 const

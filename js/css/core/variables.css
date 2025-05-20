@@ -1,7 +1,15 @@
 :root {
 
-  --staticsearch-dialog-padding: 3vw;
-  --staticsearch-dialog-margin: 3vw;
-  --staticsearch-dialog-border: 2px;
+  --staticsearch-fore: light-dark(#222, #fff);
+  --staticsearch-forelight: color-mix(in oklab, var(--staticsearch-fore) 80%, var(--staticsearch-back));
+  --staticsearch-back: light-dark(#efefef, #222);
+  --staticsearch-link: light-dark(#41648e, #77aae4);
+  --staticsearch-border: color-mix(in oklab, var(--staticsearch-back) 80%, var(--staticsearch-fore));
+  --staticsearch-backdrop: rgba(0,0,0,0.5);
 
+  --staticsearch-width: 60ch;
+  --staticsearch-margin: 3vmin;
+  --staticsearch-padding: 2vmin;
+
+  --staticsearch-box: 5.5em;
 }

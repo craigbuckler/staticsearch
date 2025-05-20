@@ -1,4 +1,5 @@
 import { stem } from './stem/__STEMFILE__';
+import { wordSet } from '../lib/wordset.js';
 import { PixDB } from 'pixdb';
 
 class StaticSearch {
@@ -11,9 +12,6 @@ class StaticSearch {
   #ready = false;       // initialized
   #db = null;           // indexedDB connector
   #stopword = null;     // stopword list
-  #debounce = null;     // search debounce
-  inputDebounce = 500;  // default debounce value
-  inputMinChars = 2;    // characters required before search occurs
   fetchTimeout = 5000;  // network timeout
 
   constructor() {
@@ -100,21 +98,21 @@ class StaticSearch {
 
 
   // search for words in string
-  async search( input ) {
+  async find( input ) {
 
     if (!this.#ready) {
       throw new Error('StaticSearch failed to initialize');
     }
 
-    const res = [], wordSet = [ ...this.#wordSet(input) ];
+    const res = [], searchWords = [ ...this.wordList(input) ];
 
-    console.log('[search] for:', wordSet);
+    console.log('[search] for:', searchWords);
 
-    if (!wordSet.length) return res;
+    if (!searchWords.length) return res;
 
     // load indexes
     await Promise.allSettled(
-      wordSet.map( w => this.loadIndex(w) )
+      searchWords.map( w => this.loadIndex(w) )
     );
 
     console.log('[search] GETTING SCORES');
@@ -122,7 +120,7 @@ class StaticSearch {
     // get page scores and calculate relevancy
     const rel = {};
     (await Promise.allSettled(
-      wordSet.map( key => this.#db.get({ store: 'index', key }) )
+      searchWords.map( key => this.#db.get({ store: 'index', key }) )
     )).forEach(s => {
       if (s.value?.page) {
 
@@ -161,16 +159,14 @@ class StaticSearch {
   }
 
 
-  // extract unique stemmed words
-  #wordSet(str) {
+  // return a normalized Set of search words
+  wordList( words ) {
 
-    return new Set(
-      str.toLowerCase()
-        .replace(/[^a-z\s]/g, ' ')
-        .trim()
-        .split(/\s+/g)
-        .map(w => stem(w).slice(0, StaticSearch.wordCrop))
-        .filter(w => w.length > 1 && !this.#stopword.has( w ))
+    return wordSet(
+      words,
+      stem,
+      StaticSearch.wordCrop,
+      this.#stopword
     );
 
   }

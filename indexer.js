@@ -13,9 +13,9 @@ class StaticSearch {
 
   // configuration defaults
   #agent = 'staticsearch';
-  #clientJS = ['staticsearch.js', 'staticsearch-component.js'];
+  #clientJS = ['staticsearch.js', 'staticsearch-bind.js', 'staticsearch-component.js'];
   #wordIndexChars = 2;
-  #JSONspacing = '  ';
+  #JSONspacing = '';
 
   language = process.env.LOCALE;
   wordCrop = process.env.WORDCROP;

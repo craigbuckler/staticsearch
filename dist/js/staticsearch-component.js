@@ -1,42 +1,7 @@
-// js/staticsearch-component.js
-import { staticsearch } from "./__SSDIR__/staticsearch.js";
-var StaticSearchWebComponent = class _StaticSearchWebComponent extends HTMLElement {
-  static path = new URL(import.meta.url).pathname.replace("__FILENAME__", "");
-  #dialog = null;
-  // initialize
-  constructor() {
-    super();
-  }
-  // component connected
-  connectedCallback() {
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = `${_StaticSearchWebComponent.path}css/component.css`;
-    this.appendChild(link);
-    this.firstElementChild.addEventListener("click", this);
-  }
-  handleEvent(e) {
-    this.#showDialog();
-  }
-  #showDialog() {
-    if (!this.#dialog) {
-      const dialog = document.createElement("dialog");
-      dialog.innerHTML = `
-        <form method="dialog">
-          <button id="close">Close</button>
-        </form>
-
-        <form>
-          <label for="search">Search</label>
-          <input type="search" id="search" />
-        </form>
-
-        <div id="results">
-        </div>
-      `;
-      this.#dialog = this.appendChild(dialog);
-    }
-    this.#dialog.showModal();
-  }
-};
-customElements.define("static-search", StaticSearchWebComponent);
+import{staticSearchQuery as l,staticSearchSetQuery as a,staticSearchInput as h,staticSearchResult as c}from"./__SSDIR__/staticsearch-bind.js";var s=class i extends HTMLElement{static path=new URL(import.meta.url).pathname.replace("__FILENAME__","");#e=null;#t=null;#i=null;constructor(){super()}connectedCallback(){let t=document.createElement("link");if(t.rel="stylesheet",t.href=`${i.path}css/component.css`,this.appendChild(t),this.#l(),this.firstElementChild.addEventListener("click",this),window.addEventListener("keydown",e=>{e.key==="k"&&(e.ctrlKey||e.metaKey)&&(e.preventDefault(),this.#s())}),l()&&(this.#s(),location.hash)){let e=document.getElementById(location.hash.slice(1));e&&e.scrollIntoView({behavior:"smooth",block:"start"})}}handleEvent(t){this.#s()}#s(){this.#e.open?this.#e.close():(this.#e.showModal(),this.#t.focus())}#l(){let t=document.createElement("dialog");t.innerHTML=`
+      <search>
+        <label for="search">${this.getAttribute("label")||"search"}</label>
+        <input type="search" id="search" name="q" minlength="2" maxlength="300" />
+      </search>
+      <div id="search-results"></div>
+    `,this.#e=this.appendChild(t),this.#t=this.querySelector("#search"),this.#i=this.querySelector("#search-results"),c(this.#i,parseFloat(this.getAttribute("maxresults")||0)),h(this.#t),this.#e.addEventListener("close",()=>{a()}),this.#e.addEventListener("click",e=>{this.#e.open&&e.target===this.#e&&this.#e.close()})}};customElements.define("static-search",s);
