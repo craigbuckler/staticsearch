@@ -1,0 +1,34 @@
+/* staticsearch defaults */
+:host {
+
+  /* font sizes */
+  --fsize: var(--staticsearch-fontsize, 1em);
+
+  /* dimensions */
+  --dmax: var(--staticsearch-maxwidth, 60ch);
+  --dmargin: var(--staticsearch-margin, 3vmin);
+  --dpadding: var(--staticsearch-padding, 2vmin);
+  --sheight: var(--staticsearch-fieldset-height, calc(3em + (2 * var(--dpadding))) );
+
+  /* colours */
+  --colback0: var(--staticsearch-color-back, Canvas);
+  --colbord0: var(--staticsearch-color-border, ButtonFace);
+
+  --colfore0: var(--staticsearch-color-fore, CanvasText);
+  --colfore1: var(--staticsearch-color-dim, color-mix(in oklab, CanvasText 70%, Canvas));
+
+  --collinkd: var(--staticsearch-color-link, color-mix(in oklab, LinkText 70%, CanvasText));
+  --collinkv: var(--staticsearch-color-visited, color-mix(in oklab, VisitedText 70%, CanvasText));
+
+  --colshad0: var(--staticsearch-color-shadow, #000);
+  --colshad1: var(--staticsearch-color-backdrop, color-mix(in srgb, var(--colshad0), transparent 30%));
+  --colblur0: var(--staticsearch-backdrop-blur, 3px);
+
+}
+
+* {
+  box-sizing: border-box;
+  font-size: inherit;
+  padding: 0;
+  margin: 0;
+}

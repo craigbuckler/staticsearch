@@ -5,7 +5,7 @@ import { deletePath } from './lib/file.js';
 
 const
   isDev = (process.env.NODE_ENV === 'development'),
-  target = 'chrome130,firefox130,safari17'.split(','),
+  target = 'chrome136,firefox136,safari17.2'.split(','),
   logLevel = isDev ? 'info' : 'error',
   minify = !isDev,
   sourcemap = false,

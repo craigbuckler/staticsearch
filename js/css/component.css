@@ -1,2 +1,5 @@
-@import url('./core/variables.css'); /* layer(staticsearch); */
-@import url('./components/dialog.css'); /* layer(staticsearch); */
+/* staticsearch-component styles */
+@import url('./partials/variables.css');
+@import url('./partials/dialog.css');
+@import url('./partials/searchform.css');
+@import url('./partials/searchresults.css');

@@ -24,17 +24,28 @@ class StaticSearchWebComponent extends HTMLElement {
   // component connected
   connectedCallback() {
 
+    // move click element to shadow DOM
+    const searchLink = this.firstElementChild;
+    searchLink.setAttribute('part', 'startsearch');
+
+    // open shadow DOM
+    this.attachShadow({ mode: 'open' });
+
     // load styles
     const link = document.createElement('link');
     link.rel = 'stylesheet';
     link.href = `${StaticSearchWebComponent.path}css/component.css`;
-    this.appendChild(link);
+    this.shadowRoot.appendChild(link);
+
+    // append link
+    const opener = this.shadowRoot.appendChild(searchLink);
 
     // create dialog
     this.#createDialog();
 
-    // search clicked
-    this.firstElementChild.addEventListener('click', this);
+    // search click
+    opener.style.cursor = 'pointer';
+    opener.addEventListener('click', () => this.#toggleDialog());
 
     // Ctrl+K click
     window.addEventListener('keydown', e => {
@@ -61,44 +72,46 @@ class StaticSearchWebComponent extends HTMLElement {
 
   }
 
-  // generic event handler
-  handleEvent(e) {
-    this.#toggleDialog();
-  }
-
   // show/hide search dialog
   #toggleDialog() {
 
     if (this.#dialog.open) {
-      // close dialog
-      this.#dialog.close();
+      this.#closeDialog();
     }
     else {
-      // show dialog
       this.#dialog.showModal();
+      this.setAttribute('aria-expanded', 'true');
       this.#search.focus();
     }
 
+  }
+
+  // close dialog
+  #closeDialog() {
+    this.#dialog.close();
+    this.removeAttribute('aria-expanded');
+    staticSearchSetQuery();
   }
 
   // create search dialog
   #createDialog() {
 
     const dialog = document.createElement('dialog');
+    dialog.setAttribute('part', 'dialog');
 
     dialog.innerHTML = `
-      <form method="dialog"><button class="close"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path xmlns="http://www.w3.org/2000/svg" fill="currentColor" d="M5.3 5.3a1 1 0 0 1 1.4 0l5.3 5.3 5.3-5.3a1 1 0 1 1 1.4 1.4L13.4 12l5.3 5.3a1 1 0 0 1-1.4 1.4L12 13.4l-5.3 5.3a1 1 0 0 1-1.4-1.4l5.3-5.3-5.3-5.3a1 1 0 0 1 0-1.4Z"/></svg></button></form>
+      <form method="dialog"><button part="close"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path xmlns="http://www.w3.org/2000/svg" fill="currentColor" d="M5.3 5.3a1 1 0 0 1 1.4 0l5.3 5.3 5.3-5.3a1 1 0 1 1 1.4 1.4L13.4 12l5.3 5.3a1 1 0 0 1-1.4 1.4L12 13.4l-5.3 5.3a1 1 0 0 1-1.4-1.4l5.3-5.3-5.3-5.3a1 1 0 0 1 0-1.4Z"/></svg></button></form>
       <search>
-        <label for="search">${ this.getAttribute('label') || 'search' }</label>
-        <input type="search" id="search" name="q" minlength="2" maxlength="300" />
+        <label for="search" part="searchlabel">${ this.getAttribute('label') || 'search' }</label>
+        <input type="search" id="search" name="q" minlength="2" maxlength="300" part="searchinput" />
       </search>
-      <div id="search-results"></div>
+      <div id="results"></div>
     `;
 
     // get elements
-    this.#dialog = this.appendChild(dialog);
-    this.#search = this.querySelector('#search');
-    this.#results = this.querySelector('#search-results');
+    this.#dialog = this.shadowRoot.appendChild(dialog);
+    this.#search = this.shadowRoot.querySelector('#search');
+    this.#results = this.shadowRoot.querySelector('#results');
 
     // bind search result
     staticSearchResult( this.#results, parseFloat( this.getAttribute('maxresults') || 0) );
@@ -107,14 +120,12 @@ class StaticSearchWebComponent extends HTMLElement {
     staticSearchInput( this.#search );
 
     // dialog close event
-    this.#dialog.addEventListener('close', () => {
-      staticSearchSetQuery();
-    });
+    this.#dialog.addEventListener('close', () => this.#closeDialog());
 
     // close by clicking backdrop
     this.#dialog.addEventListener('click', e => {
       if (this.#dialog.open && e.target === this.#dialog) {
-        this.#dialog.close();
+        this.#closeDialog();
       }
     });
 

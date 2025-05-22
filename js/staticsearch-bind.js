@@ -2,7 +2,7 @@
 import { staticsearch } from './__SSDIR__/staticsearch.js';
 
 let queryString = 'q';
-const inputDebounce = 600;
+const inputDebounce = 500;
 
 
 // search set on querystring
@@ -49,8 +49,9 @@ export function staticSearchInput( field ) {
   // debounced input
   let debounceTimer;
   field.addEventListener('input', e => {
+    const search = e.target.value;
     clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => startSearch(e.target.value), inputDebounce);
+    debounceTimer = setTimeout(() => startSearch(search), inputDebounce);
   }, false);
 
   // do search
@@ -62,7 +63,7 @@ export function staticSearchInput( field ) {
       .then( result => {
         console.log('SEARCH:', search);
         console.log('RESULT:', result);
-        field.dispatchEvent(new CustomEvent(
+        document.dispatchEvent(new CustomEvent(
           'staticsearch:find',
           {
             bubbles: true,
@@ -95,7 +96,7 @@ export function staticSearchResult( element, maxResults, messageTemplate, itemTe
   if (!messageTemplate) {
     messageTemplate = document.createElement('template');
     messageTemplate.innerHTML = `
-      <p class="searchmessage"><span class="searchcount">0</span> found for "<em class="searchterm">term</em>"&hellip;</p>
+      <p part="resultmessage"><span part="resultcount">0</span> found for <span part="searchterm"></span>&hellip;</p>
     `;
   }
 
@@ -103,9 +104,9 @@ export function staticSearchResult( element, maxResults, messageTemplate, itemTe
   if (!itemTemplate) {
     itemTemplate = document.createElement('template');
     itemTemplate.innerHTML = `
-      <li class="searchitem"><a class="url">
-        <h2 class="title"></h2>
-        <p class="description"></p>
+      <li part="item"><a part="link">
+        <h2 part="title"></h2>
+        <p part="description"></p>
       </a></li>
     `;
   }
@@ -121,51 +122,45 @@ export function staticSearchResult( element, maxResults, messageTemplate, itemTe
     element.innerHTML = '';
 
     // generate results message
-    const
-      template = messageTemplate.content.cloneNode(true),
-      searchCount = template.querySelector('.searchcount'),
-      searchTerm = template.querySelector('.searchterm');
-
-    if (searchCount) searchCount.textContent = res.length;
-    if (searchTerm) searchTerm.textContent = search;
-
-    element.appendChild(template);
+    const msg = messageTemplate.content.cloneNode(true);
+    updateNode(msg, 'resultcount', res.length);
+    updateNode(msg, 'searchterm', search);
 
     // generate results list
     const list = document.createElement('ol');
-    list.classList.add('searchlist');
+    list.setAttribute('part', 'searchresult');
 
     // and items
     res.forEach( (item, idx) => {
 
       if (maxResults && idx >= maxResults) return;
 
-      const
-        template = itemTemplate.content.cloneNode(true),
-        url = template.querySelector('.url'),
-        title = template.querySelector('.title'),
-        description = template.querySelector('.description');
-
-      if (url) {
-        url.href = item.url;
-        url.id = `staticsearchresult-${ item.id }`;
-      }
-
-      if (title) {
-        title.textContent = item.title;
-      }
-
-      if (description) {
-        description.textContent = item.description;
-      }
+      const template = itemTemplate.content.cloneNode(true);
+      updateNode(template, 'link', null, { href: item.url, id: `staticsearchresult-${ item.id }` });
+      updateNode(template, 'title', item.title);
+      updateNode(template, 'description', item.description);
 
       list.appendChild(template);
 
     });
 
+    element.appendChild(msg);
     element.appendChild(list);
     element.scrollTop = 0;
 
   }, false);
+
+
+  // update node parts
+  function updateNode(dom, part, text, attr = {}) {
+    dom
+      .querySelectorAll(`[part="${ part }"]`)
+      .forEach( n => {
+        if (text) n.textContent = text;
+        for (const [prop, value] of Object.entries(attr)) {
+          n.setAttribute(prop, value);
+        }
+      });
+  }
 
 }

@@ -1,0 +1,54 @@
+/* staticsearch dialog */
+dialog {
+  position: fixed;
+  font-size: var(--fsize);
+  inline-size: var(--dmax);
+  block-size: 100%;
+  max-inline-size: calc(100dvw - (2 * var(--dmargin)));
+  max-block-size: calc(100dvh - (2 * var(--dmargin)));
+  margin: auto;
+  padding: 0;
+  color: var(--colfore0);
+  background-color: var(--colback0);
+  border: 1px solid var(--colbord0);
+  border-radius: 5px;
+  box-shadow: 0 2px 4px var(--colshad0);
+  overflow: hidden;
+  transform-origin: 50% 0;
+
+  &, &::backdrop {
+    transition: all 0.3s ease-in-out;
+    transition-behavior: allow-discrete;
+  }
+
+  &[open] {
+
+    opacity: 1;
+    transform: scale(1);
+
+    @starting-style {
+      display: block;
+      opacity: 0.5;
+      transform: scaleX(0.5) scaleY(0);
+    }
+
+    &::backdrop {
+      background-color: var(--colshad1);
+      backdrop-filter: blur(var(--colblur0));
+
+      @starting-style {
+        background-color: rgba(0,0,0,0);
+        backdrop-filter: blur(0);
+      }
+
+    }
+
+  }
+
+  &:not([open]) {
+    display: none;
+    opacity: 0;
+    transform: scaleX(0.5) scaleY(0);
+  }
+
+}

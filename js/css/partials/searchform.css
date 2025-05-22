@@ -1,0 +1,60 @@
+/* close button */
+button {
+  position: absolute;
+  inset-inline-end: 0;
+  inset-block-start: 0;
+  block-size: 1.4em;
+  inline-size: 1.4em;
+  min-block-size: unset;
+  min-inline-size: unset;
+  padding: 0;
+  margin: 0;
+  background-color: transparent;
+  border: 0 none;
+  cursor: pointer;
+  z-index: 3;
+
+  &:is(:hover, :focus, :active) {
+    color: var(--collinkd);
+  }
+}
+
+/* search block */
+search {
+  position: absolute;
+  block-size: var(--sheight);
+  inset-inline: 0;
+  inset-block-start: 0;
+  padding-inline: var(--dpadding);
+  padding-block-start: var(--dpadding);
+  box-shadow: 0 1px 5px var(--colshad0);
+  overflow: hidden;
+  z-index: 2;
+
+  &:focus-within {
+    label, input { color: var(--colfore0); }
+    input { border-color: var(--colfore1); }
+  }
+}
+
+label {
+  display: block;
+  font-size: 0.8em;
+  padding-inline-start: 0.625em;
+  padding-block-end: 0.2em;
+  color: var(--colfore1);
+  user-select: none;
+}
+
+input {
+  display: block;
+  width: 100%;
+  line-height: 1.5;
+  padding-block: 0.2em;
+  padding-inline: 0.5em;
+  color: var(--colfore1);
+  background-color: var(--colback0);
+  border: 1px solid transparent;
+  border-radius: 3px;
+  outline-style: none;
+}
