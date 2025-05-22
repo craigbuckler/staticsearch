@@ -1,5 +1,5 @@
 /* close button */
-button {
+[part="close"] {
   position: absolute;
   inset-inline-end: 0;
   inset-block-start: 0;
@@ -20,7 +20,7 @@ button {
 }
 
 /* search block */
-search {
+[part="search"] {
   position: absolute;
   block-size: var(--sheight);
   inset-inline: 0;
@@ -37,7 +37,7 @@ search {
   }
 }
 
-label {
+[part="searchlabel"] {
   display: block;
   font-size: 0.8em;
   padding-inline-start: 0.625em;
@@ -46,7 +46,7 @@ label {
   user-select: none;
 }
 
-input {
+[part="searchinput"] {
   display: block;
   width: 100%;
   line-height: 1.5;

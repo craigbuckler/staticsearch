@@ -101,20 +101,24 @@ class StaticSearchWebComponent extends HTMLElement {
 
     dialog.innerHTML = `
       <form method="dialog"><button part="close"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path xmlns="http://www.w3.org/2000/svg" fill="currentColor" d="M5.3 5.3a1 1 0 0 1 1.4 0l5.3 5.3 5.3-5.3a1 1 0 1 1 1.4 1.4L13.4 12l5.3 5.3a1 1 0 0 1-1.4 1.4L12 13.4l-5.3 5.3a1 1 0 0 1-1.4-1.4l5.3-5.3-5.3-5.3a1 1 0 0 1 0-1.4Z"/></svg></button></form>
-      <search>
+      <search part="search">
         <label for="search" part="searchlabel">${ this.getAttribute('label') || 'search' }</label>
         <input type="search" id="search" name="q" minlength="2" maxlength="300" part="searchinput" />
       </search>
-      <div id="results"></div>
+      <div part="results"></div>
     `;
 
     // get elements
     this.#dialog = this.shadowRoot.appendChild(dialog);
     this.#search = this.shadowRoot.querySelector('#search');
-    this.#results = this.shadowRoot.querySelector('#results');
+    this.#results = this.shadowRoot.querySelector('[part="results"]');
 
     // bind search result
-    staticSearchResult( this.#results, parseFloat( this.getAttribute('maxresults') || 0) );
+    staticSearchResult(
+      this.#results,
+      this.getAttribute('minscore'),
+      this.getAttribute('maxresults')
+    );
 
     // bind search input
     staticSearchInput( this.#search );

@@ -4,6 +4,30 @@ import { staticsearch } from './__SSDIR__/staticsearch.js';
 let queryString = 'q';
 const inputDebounce = 500;
 
+// detect bindable elements
+(() => {
+
+  const
+    searchInput = document.getElementById('staticsearch_search'),
+    searchResult = document.getElementById('staticsearch_result');
+
+  if (searchResult && searchInput && searchInput.tagName === 'INPUT') {
+
+    // bind result
+    staticSearchResult(
+      searchResult,
+      searchResult.getAttribute('minscore'),
+      searchResult.getAttribute('maxresults')
+    );
+
+    // bind input
+    staticSearchInput( searchInput );
+
+  }
+
+})();
+
+
 
 // search set on querystring
 export function staticSearchQuery() {
@@ -34,17 +58,18 @@ export function staticSearchSetQuery( search, hash ) {
 
 
 // bind a search field to staticsearch
-export function staticSearchInput( field ) {
+export function staticSearchInput( field, minScore ) {
 
   // querystring
   if (field.name) queryString = field.name;
 
   // query string set?
   const qs = staticSearchQuery();
-  if (qs) {
-    field.value = qs;
-    startSearch(qs);
-  }
+  if (qs) field.value = qs;
+
+  // field value set
+  const v = field.value;
+  if (v) startSearch(v);
 
   // debounced input
   let debounceTimer;
@@ -59,7 +84,7 @@ export function staticSearchInput( field ) {
 
     if (search.length < 3) return;
 
-    staticsearch.find( search )
+    staticsearch.find( search, minScore )
       .then( result => {
         console.log('SEARCH:', search);
         console.log('RESULT:', result);
@@ -77,10 +102,30 @@ export function staticSearchInput( field ) {
 
 
 // bind staticsearch result to an output element
-export function staticSearchResult( element, maxResults, messageTemplate, itemTemplate ) {
+export function staticSearchResult( element, minScore, maxResults, resultElement, messageTemplate, itemTemplate ) {
 
   // search value
   let search = '';
+
+  minScore = parseFloat(minScore) || 0;
+  maxResults = parseFloat(maxResults) || 0;
+
+  // create default message template
+  messageTemplate = messageTemplate || document.getElementById('staticsearch_resultmessage');
+
+  if (!messageTemplate) {
+    messageTemplate = document.createElement('template');
+    messageTemplate.innerHTML = '<p part="resultmessage"><span part="resultcount">0</span> found for <span part="searchterm"></span>&hellip;</p>';
+  }
+
+  // create default item template
+  itemTemplate = itemTemplate || document.getElementById('staticsearch_item');
+
+  if (!itemTemplate) {
+    itemTemplate = document.createElement('template');
+    itemTemplate.innerHTML = '<li part="item"><a part="link"><h2 part="title"></h2><p part="description"></p></a></li>';
+  }
+
 
   // result clicked - update query string
   element.addEventListener('click', e => {
@@ -92,24 +137,6 @@ export function staticSearchResult( element, maxResults, messageTemplate, itemTe
 
   });
 
-  // create default message template
-  if (!messageTemplate) {
-    messageTemplate = document.createElement('template');
-    messageTemplate.innerHTML = `
-      <p part="resultmessage"><span part="resultcount">0</span> found for <span part="searchterm"></span>&hellip;</p>
-    `;
-  }
-
-  // create default item template
-  if (!itemTemplate) {
-    itemTemplate = document.createElement('template');
-    itemTemplate.innerHTML = `
-      <li part="item"><a part="link">
-        <h2 part="title"></h2>
-        <p part="description"></p>
-      </a></li>
-    `;
-  }
 
   // result event
   document.addEventListener('staticsearch:find', e => {
@@ -121,19 +148,14 @@ export function staticSearchResult( element, maxResults, messageTemplate, itemTe
     // clear results
     element.innerHTML = '';
 
-    // generate results message
-    const msg = messageTemplate.content.cloneNode(true);
-    updateNode(msg, 'resultcount', res.length);
-    updateNode(msg, 'searchterm', search);
-
     // generate results list
-    const list = document.createElement('ol');
+    const list = document.createElement(resultElement || 'ol');
     list.setAttribute('part', 'searchresult');
 
     // and items
     res.forEach( (item, idx) => {
 
-      if (maxResults && idx >= maxResults) return;
+      if ((minScore && item.relevancy < minScore) || (maxResults && idx >= maxResults)) return;
 
       const template = itemTemplate.content.cloneNode(true);
       updateNode(template, 'link', null, { href: item.url, id: `staticsearchresult-${ item.id }` });
@@ -143,6 +165,11 @@ export function staticSearchResult( element, maxResults, messageTemplate, itemTe
       list.appendChild(template);
 
     });
+
+    // generate results message
+    const msg = messageTemplate.content.cloneNode(true);
+    updateNode(msg, 'resultcount', list.childElementCount);
+    updateNode(msg, 'searchterm', search);
 
     element.appendChild(msg);
     element.appendChild(list);
@@ -156,10 +183,16 @@ export function staticSearchResult( element, maxResults, messageTemplate, itemTe
     dom
       .querySelectorAll(`[part="${ part }"]`)
       .forEach( n => {
-        if (text) n.textContent = text;
+
         for (const [prop, value] of Object.entries(attr)) {
           n.setAttribute(prop, value);
         }
+
+        if (text) {
+          while (n.firstElementChild) n = n.firstElementChild;
+          n.textContent = text;
+        }
+
       });
   }
 
