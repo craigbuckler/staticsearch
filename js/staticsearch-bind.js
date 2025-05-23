@@ -1,7 +1,7 @@
 // staticsearch input/output binding
 import { staticsearch } from './__SSDIR__/staticsearch.js';
 
-let queryString = 'q';
+let queryString = 'q', queryCount = 0;
 const inputDebounce = 500;
 
 // detect bindable elements
@@ -11,7 +11,7 @@ const inputDebounce = 500;
     searchInput = document.getElementById('staticsearch_search'),
     searchResult = document.getElementById('staticsearch_result');
 
-  if (searchResult && searchInput && searchInput.tagName === 'INPUT') {
+  if (searchResult) {
 
     // bind result
     staticSearchResult(
@@ -19,6 +19,10 @@ const inputDebounce = 500;
       searchResult.getAttribute('minscore'),
       searchResult.getAttribute('maxresults')
     );
+
+  }
+
+  if (searchInput && searchInput.tagName === 'INPUT') {
 
     // bind input
     staticSearchInput( searchInput );
@@ -58,7 +62,7 @@ export function staticSearchSetQuery( search, hash ) {
 
 
 // bind a search field to staticsearch
-export function staticSearchInput( field, minScore ) {
+export function staticSearchInput( field ) {
 
   // querystring
   if (field.name) queryString = field.name;
@@ -82,19 +86,12 @@ export function staticSearchInput( field, minScore ) {
   // do search
   function startSearch( search ) {
 
-    if (search.length < 3) return;
+    if (search.length < 2) return;
 
-    staticsearch.find( search, minScore )
+    staticsearch.find( search )
       .then( result => {
         console.log('SEARCH:', search);
         console.log('RESULT:', result);
-        document.dispatchEvent(new CustomEvent(
-          'staticsearch:find',
-          {
-            bubbles: true,
-            detail: { search, result }
-          }
-        ));
       });
   }
 
@@ -139,7 +136,7 @@ export function staticSearchResult( element, minScore, maxResults, resultElement
 
 
   // result event
-  document.addEventListener('staticsearch:find', e => {
+  document.addEventListener('staticsearch:result', e => {
 
     // results
     search = e.detail.search;
@@ -173,7 +170,23 @@ export function staticSearchResult( element, minScore, maxResults, resultElement
 
     element.appendChild(msg);
     element.appendChild(list);
-    element.scrollTop = 0;
+
+    // scroll to linked item on first load
+    if (!queryCount && location.hash) {
+
+      const link = element.querySelector( location.hash );
+
+      if (link) {
+        link.focus();
+        link.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+    }
+    else {
+      element.scrollTop = 0;
+    }
+
+    queryCount++;
 
   }, false);
 

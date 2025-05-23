@@ -98,17 +98,23 @@ class StaticSearch {
 
 
   // search for words in string
-  async find( input ) {
+  async find( search ) {
 
     if (!this.#ready) {
       throw new Error('StaticSearch failed to initialize');
     }
 
-    const res = [], searchWords = [ ...this.wordList(input) ];
+    search = search.trim();
+    this.#triggerEvent('find', { search });
+
+    const result = [], searchWords = [ ...this.wordList(search) ];
 
     console.log('[search] for:', searchWords);
 
-    if (!searchWords.length) return res;
+    if (!searchWords.length) {
+      this.#triggerEvent('result', { search, result });
+      return result;
+    }
 
     // load indexes
     await Promise.allSettled(
@@ -147,12 +153,15 @@ class StaticSearch {
 
       if (!pData.value) return;
 
-      res[idx] = pData.value;
-      res[idx].relevancy = page[idx].relevancy;
+      result[idx] = pData.value;
+      result[idx].relevancy = page[idx].relevancy;
 
     });
 
-    return res;
+    // result event
+    this.#triggerEvent('result', { search, result });
+
+    return result;
 
   }
 
@@ -225,6 +234,17 @@ class StaticSearch {
     ] ));
 
     console.log('[loadIndex] COMPLETE');
+
+  }
+
+
+  // trigger a staticsearch event
+  #triggerEvent( type = 'unknown', detail = {} ) {
+
+    document.dispatchEvent(new CustomEvent(
+      'staticsearch:' + type,
+      { detail }
+    ));
 
   }
 

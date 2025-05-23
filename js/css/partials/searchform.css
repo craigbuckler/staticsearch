@@ -46,7 +46,7 @@
   user-select: none;
 }
 
-[part="searchinput"] {
+input[part="searchinput"] {
   display: block;
   width: 100%;
   line-height: 1.5;

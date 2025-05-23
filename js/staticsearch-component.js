@@ -45,7 +45,7 @@ class StaticSearchWebComponent extends HTMLElement {
 
     // search click
     opener.style.cursor = 'pointer';
-    opener.addEventListener('click', () => this.#toggleDialog());
+    opener.addEventListener('click', e => { e.preventDefault(); this.#toggleDialog(); });
 
     // Ctrl+K click
     window.addEventListener('keydown', e => {
@@ -57,17 +57,7 @@ class StaticSearchWebComponent extends HTMLElement {
 
     // query string set?
     if (staticSearchQuery()) {
-
       this.#toggleDialog();
-
-      // scroll result into view
-      if (location.hash) {
-        const link = document.getElementById( location.hash.slice(1) );
-        if (link) {
-          link.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }
-
     }
 
   }

@@ -29,7 +29,8 @@ class StaticSearch {
   siteParseRobotsFile = (process.env.SITE_PARSEROBOTSFILE?.toLowerCase() !== 'false');
   siteParseRobotsMeta = (process.env.SITE_PARSEROBOTSMETA?.toLowerCase() !== 'false');
 
-  pageDOMSelectors = (process.env.PAGE_DOMSELECTORS || 'main').split(',').map(v => v.trim());
+  pageDOMSelectors = (process.env.PAGE_DOMSELECTORS || 'main');
+  pageDOMExclude = (process.env.PAGE_DOMEXCLUDE || 'nav');
 
   wordWeight = {
     title:        parseFloat(process.env.WEIGHT_TITLE  || 10),
@@ -70,6 +71,14 @@ class StaticSearch {
       this.#agent,
       this.siteParseRobotsFile
     );
+
+    // parse DOM selectors
+    if (!Array.isArray(this.pageDOMSelectors)) this.pageDOMSelectors = this.pageDOMSelectors.split(',');
+    this.pageDOMSelectors = this.pageDOMSelectors.map(v => v.trim());
+
+    // parse DOM exclusions
+    if (!Array.isArray(this.pageDOMExclude)) this.pageDOMExclude = this.pageDOMExclude.split(',');
+    this.pageDOMExclude = this.pageDOMExclude.map(v => v.trim());
 
     // find all HTML files and slugs
     let buildFile = (await readdir(workingBuildDir, { recursive: true }))
@@ -114,6 +123,7 @@ class StaticSearch {
         const html = parseHTML(
           f.value,                // HTML string
           this.pageDOMSelectors,  // DOM selectors
+          this.pageDOMExclude,    // DOM exclusions
           this.siteDomain,        // domain
           buildFile[idx].slug,    // slug
           this.siteIndexFile,     // index filename
@@ -290,7 +300,7 @@ class StaticSearch {
 
     this.#showMetrics();
 
-    log(`search indexing complete
+    log(`indexing complete
        pages indexed: ${ String(pageIndex.length).padStart(5, ' ') }
         unique words: ${ String(wordIndex.size).padStart(5, ' ') }
          index files: ${ String(wordFileList.length + 1).padStart(5, ' ') }

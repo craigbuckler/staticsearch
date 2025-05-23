@@ -16,6 +16,7 @@ const
     { env: 'BUILD_ROOT',            cli: 'root',            prop: 'buildRoot',              type: 'path',       help: 'site root path (/)' },
     { env: 'SITE_INDEXFILE',        cli: 'indexfile',       prop: 'siteIndexFile',          type: 'name',       help: 'default index file (index.html)' },
     { env: 'PAGE_DOMSELECTORS',     cli: 'dom',             prop: 'pageDOMSelectors',       type: 'nodelist',   help: 'comma-separated content DOM nodes (\'main\')' },
+    { env: 'PAGE_DOMEXCLUDE',       cli: 'domx',            prop: 'pageDOMExclude',         type: 'nodelist',   help: 'comma-separated DOM nodes to exclude (\'nav\')' },
     { env: 'SITE_PARSEROBOTSFILE',  cli: 'robotfile',       prop: 'siteParseRobotsFile',    type: 'true|false', help: 'parse robot.txt Disallows (true)' },
     { env: 'SITE_PARSEROBOTSMETA',  cli: 'robotmeta',       prop: 'siteParseRobotsMeta',    type: 'true|false', help: 'parse robot meta noindex (true)' },
     { env: 'LANGUAGE',              cli: 'language',        prop: 'language',               type: 'str',        help: 'language (en)' },
