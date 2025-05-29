@@ -87,6 +87,7 @@ class StaticSearchWebComponent extends HTMLElement {
   #createDialog() {
 
     const dialog = document.createElement('dialog');
+    dialog.setAttribute('closedby', 'any');
     dialog.setAttribute('part', 'dialog');
 
     dialog.innerHTML = `
