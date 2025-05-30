@@ -1,7 +1,7 @@
 {
   "name": "staticsearch",
   "version": "0.1.0",
-  "description": "Static site search engine",
+  "description": "Simple static site search system.",
   "type": "module",
   "main": "index.js",
   "exports": "./indexer.js",
@@ -9,8 +9,10 @@
     "staticsearch": "index.js"
   },
   "files": [
-    "lib",
-    "dist",
+    "dist/",
+    "lib/",
+    "stem/",
+    "stopwords/",
     "index.js",
     "indexer.js",
     "README.md",
@@ -20,8 +22,10 @@
     "static",
     "site",
     "search",
+    "engine",
     "find",
-    "index"
+    "index",
+    "query"
   ],
   "homepage": "https://github.com/craigbuckler/staticsearch#readme",
   "bugs": {

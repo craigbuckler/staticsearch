@@ -1,7 +1,4 @@
-// stem/stem.js
-function stem(word) {
+// default stemming function - does nothing
+export function stem(word) {
   return word;
 }
-export {
-  stem
-};

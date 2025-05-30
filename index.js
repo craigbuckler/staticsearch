@@ -1,124 +1,172 @@
 #!/usr/bin/env node
-import process from 'node:process';
 import pkg from './package.json' with { type: 'json' };
+import process from 'node:process';
+import { parseArgs, styleText } from 'node:util';
 
-import { parseCliArgs } from './lib/parser.js';
 import { staticsearch } from './indexer.js';
 
 
 const
-  // configuration
+  // option configuration
   config = [
-    { env: null,                    cli: 'env',             prop: null,                     type: 'file',       help: 'load defaults from an .env file' },
-    { env: 'BUILD_DIR',             cli: 'builddir',        prop: 'buildDir',               type: 'path',       help: 'directory containing static files (./build/)' },
-    { env: 'SEARCH_DIR',            cli: 'searchdir',       prop: 'searchDir',              type: 'path',       help: 'index file directory (./build/search/)' },
-    { env: 'SITE_DOMAIN',           cli: 'domain',          prop: 'siteDomain',             type: 'domain',     help: 'site domain if links use full URL (http://localhost)' },
-    { env: 'BUILD_ROOT',            cli: 'root',            prop: 'buildRoot',              type: 'path',       help: 'site root path (/)' },
-    { env: 'SITE_INDEXFILE',        cli: 'indexfile',       prop: 'siteIndexFile',          type: 'name',       help: 'default index file (index.html)' },
-    { env: 'PAGE_DOMSELECTORS',     cli: 'dom',             prop: 'pageDOMSelectors',       type: 'nodelist',   help: 'comma-separated content DOM nodes (\'main\')' },
-    { env: 'PAGE_DOMEXCLUDE',       cli: 'domx',            prop: 'pageDOMExclude',         type: 'nodelist',   help: 'comma-separated DOM nodes to exclude (\'nav\')' },
-    { env: 'SITE_PARSEROBOTSFILE',  cli: 'robotfile',       prop: 'siteParseRobotsFile',    type: 'true|false', help: 'parse robot.txt Disallows (true)' },
-    { env: 'SITE_PARSEROBOTSMETA',  cli: 'robotmeta',       prop: 'siteParseRobotsMeta',    type: 'true|false', help: 'parse robot meta noindex (true)' },
-    { env: 'LANGUAGE',              cli: 'language',        prop: 'language',               type: 'str',        help: 'language (en)' },
-    { env: 'WORDCROP',              cli: 'wordcrop',        prop: 'wordCrop',               type: 'num',        help: 'crop word letters (7)' },
-    { env: 'STOPWORDS',             cli: 'stopwords',       prop: 'stopWords',              type: 'str',        help: 'comma-separated list of stop words (\'\')' },
-    { env: 'WEIGHT_LINK',           cli: 'weightlink',      prop: 'wordWeight.link',        type: 'num',        help: 'word weight for inbound links (5)' },
-    { env: 'WEIGHT_TITLE',          cli: 'weighttitle',     prop: 'wordWeight.title',       type: 'num',        help: 'word weight for main title (10)' },
-    { env: 'WEIGHT_DESCRIPTION',    cli: 'weightdesc',      prop: 'wordWeight.description', type: 'num',        help: 'word weight for description (8)' },
-    { env: 'WEIGHT_H2',             cli: 'weighth2',        prop: 'wordWeight.h2',          type: 'num',        help: 'word weight for H2 headings (6)' },
-    { env: 'WEIGHT_H3',             cli: 'weighth3',        prop: 'wordWeight.h3',          type: 'num',        help: 'word weight for H3 headings (5)' },
-    { env: 'WEIGHT_H4',             cli: 'weighth4',        prop: 'wordWeight.h4',          type: 'num',        help: 'word weight for H4 headings (4)' },
-    { env: 'WEIGHT_H5',             cli: 'weighth5',        prop: 'wordWeight.h5',          type: 'num',        help: 'word weight for H5 headings (3)' },
-    { env: 'WEIGHT_H6',             cli: 'weighth6',        prop: 'wordWeight.h6',          type: 'num',        help: 'word weight for H6 headings (2)' },
-    { env: 'WEIGHT_EMPHASIS',       cli: 'weightemphasis',  prop: 'wordWeight.emphasis',    type: 'num',        help: 'word weight for bold and italic (2)' },
-    { env: 'WEIGHT_ALT',            cli: 'weightalt',       prop: 'wordWeight.alt',         type: 'num',        help: 'word weight for alt tags (1)' },
-    { env: 'WEIGHT_CONTENT',        cli: 'weightcontent',   prop: 'wordWeight.content',     type: 'num',        help: 'word weight for content (1)' },
-    { env: null,                    cli: 'v',               prop: null,                     type: null,         help: 'show application version' },
-    { env: null,                    cli: 'version',         prop: null,                     type: null,         help: 'show application version' },
-    { env: null,                    cli: '?',               prop: null,                     type: null,         help: 'show help' },
-    { env: null,                    cli: 'help',            prop: null,                     type: null,         help: 'show help' },
-    { env: null,                    cli: 'helpenv',         prop: null,                     type: null,         help: 'show .env help' },
-    { env: null,                    cli: 'helpapi',         prop: null,                     type: null,         help: 'show Node.js API help' },
+    { env: null,                    cli: 'env',             clis: 'e',    prop: null,                     type: 'file',         default: null,                help: 'load defaults from an .env file' },
+    { env: 'BUILD_DIR',             cli: 'builddir',        clis: 'b',    prop: 'buildDir',               type: 'path',         default: './build/',          help: 'directory containing static files' },
+    { env: 'SEARCH_DIR',            cli: 'searchdir',       clis: 's',    prop: 'searchDir',              type: 'path',         default: './build/search/',   help: 'index file directory' },
+    { env: 'SITE_DOMAIN',           cli: 'domain',          clis: 'd',    prop: 'siteDomain',             type: 'domain',       default: 'http://localhost',  help: 'site domain if links use full URL' },
+    { env: 'BUILD_ROOT',            cli: 'root',            clis: 'r',    prop: 'buildRoot',              type: 'path',         default: '/',                 help: 'site root path' },
+    { env: 'SITE_INDEXFILE',        cli: 'indexfile',       clis: 'i',    prop: 'siteIndexFile',          type: 'name',         default: 'index.html',        help: 'default index file' },
+    { env: 'SITE_PARSEROBOTSFILE',  cli: 'robotfile',       clis: 'f',    prop: 'siteParseRobotsFile',    type: 'true|false',   default: true,                help: 'parse robot.txt Disallows' },
+    { env: 'SITE_PARSEROBOTSMETA',  cli: 'robotmeta',       clis: 'm',    prop: 'siteParseRobotsMeta',    type: 'true|false',   default: true,                help: 'parse robot meta noindex' },
+    { env: 'PAGE_DOMSELECTORS',     cli: 'dom',             clis: 'D',    prop: 'pageDOMSelectors',       type: 'nodelist',     default: 'main',              help: 'comma-separated content DOM nodes' },
+    { env: 'PAGE_DOMEXCLUDE',       cli: 'domx',            clis: 'X',    prop: 'pageDOMExclude',         type: 'nodelist',     default: 'nav',               help: 'comma-separated DOM nodes to exclude' },
+    { env: 'LANGUAGE',              cli: 'language',        clis: 'l',    prop: 'language',               type: 'str',          default: 'en',                help: 'language' },
+    { env: 'WORDCROP',              cli: 'wordcrop',        clis: 'c',    prop: 'wordCrop',               type: 'num',          default: 7,                   help: 'crop word letters' },
+    { env: 'STOPWORDS',             cli: 'stopwords',       clis: 'S',    prop: 'stopWords',              type: 'str',          default: null,                help: 'comma-separated list of stop words' },
+    { env: 'WEIGHT_LINK',           cli: 'weightlink',      clis: '',     prop: 'wordWeight.link',        type: 'num',          default: 5,                   help: 'word weight for inbound links' },
+    { env: 'WEIGHT_TITLE',          cli: 'weighttitle',     clis: '',     prop: 'wordWeight.title',       type: 'num',          default: 10,                  help: 'word weight for main title' },
+    { env: 'WEIGHT_DESCRIPTION',    cli: 'weightdesc',      clis: '',     prop: 'wordWeight.description', type: 'num',          default: 8,                   help: 'word weight for description' },
+    { env: 'WEIGHT_H2',             cli: 'weighth2',        clis: '',     prop: 'wordWeight.h2',          type: 'num',          default: 6,                   help: 'word weight for H2 headings' },
+    { env: 'WEIGHT_H3',             cli: 'weighth3',        clis: '',     prop: 'wordWeight.h3',          type: 'num',          default: 5,                   help: 'word weight for H3 headings' },
+    { env: 'WEIGHT_H4',             cli: 'weighth4',        clis: '',     prop: 'wordWeight.h4',          type: 'num',          default: 4,                   help: 'word weight for H4 headings' },
+    { env: 'WEIGHT_H5',             cli: 'weighth5',        clis: '',     prop: 'wordWeight.h5',          type: 'num',          default: 3,                   help: 'word weight for H5 headings' },
+    { env: 'WEIGHT_H6',             cli: 'weighth6',        clis: '',     prop: 'wordWeight.h6',          type: 'num',          default: 2,                   help: 'word weight for H6 headings' },
+    { env: 'WEIGHT_EMPHASIS',       cli: 'weightemphasis',  clis: '',     prop: 'wordWeight.emphasis',    type: 'num',          default: 2,                   help: 'word weight for bold and italic' },
+    { env: 'WEIGHT_ALT',            cli: 'weightalt',       clis: '',     prop: 'wordWeight.alt',         type: 'num',          default: 1,                   help: 'word weight for alt tags' },
+    { env: 'WEIGHT_CONTENT',        cli: 'weightcontent',   clis: '',     prop: 'wordWeight.content',     type: 'num',          default: 1,                   help: 'word weight for content' },
+    { env: null,                    cli: 'version',         clis: 'v',    prop: null,                     type: null,           default: null,                help: 'show application version' },
+    { env: null,                    cli: 'help',            clis: '?',    prop: null,                     type: null,           default: null,                help: 'show help' },
+    { env: null,                    cli: 'helpenv',         clis: 'E',    prop: null,                     type: null,           default: null,                help: 'show .env/environment variable help' },
+    { env: null,                    cli: 'helpapi',         clis: 'A',    prop: null,                     type: null,           default: null,                help: 'show Node.js API help' },
   ],
+  helpLink = styleText(['cyanBright'], 'For help, refer to https://github.com/craigbuckler/staticsearch');
 
-  // parse CLI arguments
-  opt = parseCliArgs(
-    Object.fromEntries( config.filter(c => c.cli).map(c => [c.cli, null]) ),
-    'builddir'
-  );
+// default options
+let opt = { help: true };
+
+// parse CLI arguments
+try {
+
+  const
+    args = [...process.argv].slice(2),
+    options = {};
+
+  // build CLI options
+  config.forEach(o => {
+    options[o.cli] = {
+      type: !o.type || o.type === 'true|false' ? 'boolean' : 'string'
+    };
+    if (o.clis) options[o.cli].short = o.clis;
+  });
+
+  // parse arguments
+  const { values, positionals } = parseArgs({ args, options, strict: true, allowPositionals: true });
+
+  // set build directory to first positional argument
+  if (positionals.length == 1 && !values.builddir) values.builddir = positionals[0];
+
+  opt = { ...values };
+
+}
+catch (err) {
+  console.error( styleText(['redBright'], `Error parsing arguments: ${ err.message }`) );
+}
 
 // show version
-if (opt.version || opt.v) {
+if (opt.version) {
   console.log(`${ pkg.version }`);
-  process.exit(0);
 }
 
 
 // show CLI help
-if (opt.help || opt['?']) {
+if (opt.help) {
 
-  console.log(`StaticSearch creates a search index for static websites.
-You can define options on the CLI, in environment variables, or the Node.js API.
+  console.log(`
+${ styleText(['yellowBright'], 'StaticSearch CLI help') }
 
-CLI usage:  staticsearch [options]
+StaticSearch is a search engine for static websites.
+${ helpLink }
 
-StaticSearch options:
+The indexer scans your site's built files and generates a directory of
+JavaScript and JSON data. A search facility is then available on that
+site without the need for server-side processing or a database.
 
-${ config.filter(c => c.cli).map(c => `  --${ (c.cli + (c.type ? ' <' + c.type + '>' : '')).padEnd(24) }${ c.help }`).join('\n') }
+Indexing options can be set on the CLI, in environment variables, or
+the Node.js API.
 
-All options can use single dash (-), double dash (--), or "--name=value" format.
+CLI usage: ${ styleText(['whiteBright'], 'staticsearch') + styleText(['dim'], ' [options]') }
+
+Options:
+
+${
+  config
+    .filter(c => c.cli)
+    .map(c => `  ${ (c.clis ? `-${ c.clis }, ` : '    ') }--${ c.cli.padEnd(14) }${ styleText(['dim'], (c.type ? ' <' + c.type + '>' : '').padEnd(13)) } ${ c.help } ${ c.default ? styleText(['dim'], `(${ c.default })`) : '' }`)
+    .join('\n')
+}
+
+Options can use "--name value" or "--name=value" format.
+
 Examples:
 
-  staticsearch -builddir=./dest/ --root /blog/ -indexfile default.htm
-  staticsearch --domain http://site.com -searchdir=./build/find/
+  staticsearch --builddir=./dest/ --root /blog/ --indexfile default.htm
+  staticsearch --domain http://site.com --searchdir=./build/find/
 
-The first non-dashed parameter is presumed to be the build:
+The first non-dashed parameter is presumed to be the build directory:
 
-  staticsearch ./build/
+  staticsearch ./dest/ --searchdir=./dest/search/
 
 `);
-
-  process.exit(0);
 }
 
 
 // show .env help
 if (opt.helpenv) {
 
-  console.log(`You can set StaticSearch indexing parameters using environment variables.
-These can also be defined in a file and loaded using --env <file>.
+  console.log(`
+${ styleText(['yellowBright'], 'StaticSearch environment variable help') }
 
-StaticSearch variables:
+StaticSearch indexing options can be set using environment variables.
+Variables can also be defined in a file and loaded with ${ styleText(['dim'], '--env <file>') }
 
-${ config.filter(c => c.env).map(c => `  ${ (c.env + (c.type ? '=<' + c.type + '>' : '')).padEnd(35) }${ c.help }`).join('\n') }
+Variables:
 
-Example .env file:
+${ config
+    .filter(c => c.env)
+    .map(c => `  ${ c.env }${ styleText(['dim'], (c.type ? '=<' + c.type + '>' : '').padEnd(33 - c.env.length)) } ${ c.help } ${ c.default ? styleText(['dim'], `(${ c.default })`) : '' }`)
+    .join('\n')
+}
+${ styleText(['green'], `
+# Example .env file
 BUILD_DIR=./dest/
 SEARCH_DIR=./dest/index/
 BUILD_ROOT=/blog/
-
+`) }
 Load using:
 
-  staticsearch --env .env
+  ${ styleText(['whiteBright'], 'staticsearch') + styleText(['dim'], ' --env .env') }
 
 Note that CLI arguments take precedence over environment variables.
-`);
 
-  process.exit(0);
+${ helpLink }
+`);
 }
 
 
 // show API help
 if (opt.helpapi) {
 
-  console.log(`You can use the Node.js API to index a static site.
+  console.log(`
+${ styleText(['yellowBright'], 'StaticSearch Node.js API help') }
 
-Install the module:
+You can use the Node.js API to programmatically index a static site.
 
-  npm install staticsearch
+Install the module into a Node.js project:
 
-Example code:
+  ${ styleText(['whiteBright'], 'npm install staticsearch') }
 
+Create a JavaScript file (such as index.js):
+${ styleText(['green'], `
+  // EXAMPLE CODE
   import { staticsearch } from 'staticsearch';
 
   // configuration
@@ -127,16 +175,31 @@ Example code:
   staticsearch.buildRoot = './blog/';
   staticsearch.wordWeight.title = 20;
 
-  // run index
+  // run indexer
   await staticsearch.index();
+`) }
+Then run it:
 
-StaticSearch configuration properties:
+  ${ styleText(['whiteBright'], 'node index.js') }
 
-${ config.filter(c => c.prop).map(c => `  staticsearch.${ (c.prop + (c.type ? ' = <' + c.type + '>;' : '')).padEnd(37) }${ c.help }`).join('\n') }
+staticsearch object configuration properties:
 
-When a value is not defined, staticsearch uses environment variables where available.
+${ config
+    .filter(c => c.prop)
+    .map(c => `  ${ styleText(['green'], '.' + c.prop) }${ styleText(['dim'], (c.type ? ' = <' + c.type + '>;' : '').padEnd(35 - c.prop.length)) } ${ c.help } ${ c.default ? styleText(['dim'], `(${ c.type != 'num' && c.type != 'true|false' ? '\'' : ''}${ c.default }${ c.type != 'num' && c.type != 'true|false' ? '\'' : ''})`) : '' }`)
+    .join('\n')
+}
+
+When a value is not defined, staticsearch falls back to an
+environment variable then the default value ${ styleText(['dim'], '(shown in brackets)') }.
+
+${ helpLink }
 `);
+}
 
+
+// exit if version or help requested
+if (opt.version || opt.help || opt.helpenv || opt.helpapi) {
   process.exit(0);
 }
 
