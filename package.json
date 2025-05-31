@@ -1,6 +1,6 @@
 {
   "name": "staticsearch",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Simple static site search system.",
   "type": "module",
   "main": "index.js",
@@ -14,9 +14,7 @@
     "stem/",
     "stopwords/",
     "index.js",
-    "indexer.js",
-    "README.md",
-    "LICENSE"
+    "indexer.js"
   ],
   "keywords": [
     "static",
@@ -43,7 +41,7 @@
   },
   "scripts": {
     "build.dev": "NODE_ENV=development node ./esbuild.config.js",
-    "build": "node ./esbuild.config.js",
+    "build": "NODE_ENV=production node ./esbuild.config.js",
     "prepublishOnly": "npm run build",
     "start": "node ./index.js",
     "test": "echo \"Error: no test specified\" && exit 1"

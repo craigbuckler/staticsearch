@@ -49,7 +49,7 @@ class StaticSearch {
   // start indexing
   async index() {
 
-    performance.mark('total indexing time:start');
+    this.#recPerf('total indexing time');
 
     // resolved working directories
     const
@@ -111,7 +111,7 @@ class StaticSearch {
     // read and parse HTML files but remove any with:
     // <meta name="robots" content="noindex">
     // <meta name="staticsearch" content="noindex">
-    performance.mark('parse HTML files:start');
+    this.#recPerf('parse HTML files');
     const robotRe = new RegExp(`<meta.*name=.*(robots|${ this.#agent }).*noindex`, 'i');
 
     (await Promise.allSettled(
@@ -154,8 +154,8 @@ class StaticSearch {
     // sort by slug
     buildFile.sort((a, b) => a.slug > b.slug ? 1 : -1);
 
-    performance.mark('parse HTML files:end');
-    performance.mark('word scoring:start');
+    this.#recPerf('parse HTML files', true);
+    this.#recPerf('word scoring');
 
     const
       pageMap = new Map( buildFile.map((p, i) => [p.slug, i]) ),
@@ -209,8 +209,8 @@ class StaticSearch {
 
     });
 
-    performance.mark('word scoring:end');
-    performance.mark('write index files:start');
+    this.#recPerf('word scoring', true);
+    this.#recPerf('write index files');
 
     // output index files
     await deletePath(workingSearchDir);
@@ -294,9 +294,9 @@ class StaticSearch {
     // copy CSS files
     await cp(join(workingStaticSite, './dist/css/'), join(workingSearchDir, './css/'), { recursive: true, force: true } );
 
-    performance.mark('write index files:end');
+    this.#recPerf('write index files', true);
 
-    performance.mark('total indexing time:end');
+    this.#recPerf('total indexing time', true);
 
     this.#showMetrics();
 
@@ -308,19 +308,31 @@ class StaticSearch {
     'info');
   }
 
+
+  // record performance metric
+  #recPerf(name, done = false) {
+    performance.mark(`[${ this.#agent }] ${ name }:${ done ? 1 : 0 }`);
+  }
+
+
   // log performance metrics
   #showMetrics() {
 
     const metrics = new Set(
       [...performance.getEntries()]
-        .map( p => p.name.replace(/:(start|end)$/i, '') )
+        .filter( p => p.name.startsWith(`[${ this.#agent }] `))
+        .map( p => p.name.replace(/:.$/i, '') )
     );
 
     let msg = '';
     metrics.forEach(m => {
 
-      const p = Math.ceil( performance.measure(m, m + ':start', m + ':end').duration );
-      msg += m.padStart(20,' ') + ':' + String(p).padStart(6, ' ') + 'ms\n';
+      const p = Math.ceil( performance.measure(m, m + ':0', m + ':1').duration );
+      msg += m.slice( this.#agent.length + 3 ).padStart(20,' ') + ':' + String(p).padStart(6, ' ') + 'ms\n';
+
+      performance.clearMarks(m + ':0');
+      performance.clearMarks(m + ':1');
+      performance.clearMeasures(m);
 
     });
 
