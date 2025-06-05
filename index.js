@@ -15,8 +15,8 @@ const
     { env: 'SITE_DOMAIN',           cli: 'domain',          clis: 'd',    prop: 'siteDomain',             type: 'domain',       default: 'http://localhost',  help: 'site domain if links use full URL' },
     { env: 'BUILD_ROOT',            cli: 'root',            clis: 'r',    prop: 'buildRoot',              type: 'path',         default: '/',                 help: 'site root path' },
     { env: 'SITE_INDEXFILE',        cli: 'indexfile',       clis: 'i',    prop: 'siteIndexFile',          type: 'name',         default: 'index.html',        help: 'default index file' },
-    { env: 'SITE_PARSEROBOTSFILE',  cli: 'robotfile',       clis: 'f',    prop: 'siteParseRobotsFile',    type: 'true|false',   default: true,                help: 'parse robot.txt Disallows' },
-    { env: 'SITE_PARSEROBOTSMETA',  cli: 'robotmeta',       clis: 'm',    prop: 'siteParseRobotsMeta',    type: 'true|false',   default: true,                help: 'parse robot meta noindex' },
+    { env: 'SITE_PARSEROBOTSFILE',  cli: 'ignorerobotfile', clis: 'f',    prop: 'siteParseRobotsFile',    type: 'true|false',   default: true,                help: 'parse robot.txt Disallows' },
+    { env: 'SITE_PARSEROBOTSMETA',  cli: 'ignorerobotmeta', clis: 'm',    prop: 'siteParseRobotsMeta',    type: 'true|false',   default: true,                help: 'parse robot meta noindex' },
     { env: 'PAGE_DOMSELECTORS',     cli: 'dom',             clis: 'D',    prop: 'pageDOMSelectors',       type: 'nodelist',     default: 'main',              help: 'comma-separated content DOM nodes' },
     { env: 'PAGE_DOMEXCLUDE',       cli: 'domx',            clis: 'X',    prop: 'pageDOMExclude',         type: 'nodelist',     default: 'nav',               help: 'comma-separated DOM nodes to exclude' },
     { env: 'LANGUAGE',              cli: 'language',        clis: 'l',    prop: 'language',               type: 'str',          default: 'en',                help: 'language' },
@@ -100,7 +100,7 @@ Options:
 ${
   config
     .filter(c => c.cli)
-    .map(c => `  ${ (c.clis ? `-${ c.clis }, ` : '    ') }--${ c.cli.padEnd(14) }${ styleText(['dim'], (c.type ? ' <' + c.type + '>' : '').padEnd(13)) } ${ c.help } ${ c.default ? styleText(['dim'], `(${ c.default })`) : '' }`)
+    .map(c => `  ${ (c.clis ? `-${ c.clis }, ` : '    ') }--${ c.cli.padEnd(15) }${ styleText(['dim'], (c.type && c.type !== 'true|false' ? ' <' + c.type + '>' : '').padEnd(13)) } ${ c.help } ${ c.default ? styleText(['dim'], `(${ c.default })`) : '' }`)
     .join('\n')
 }
 
@@ -219,8 +219,6 @@ config.forEach(c => {
 
   if (value) {
 
-    value = value.trim();
-
     switch (c.type) {
 
       case 'int':
@@ -229,8 +227,7 @@ config.forEach(c => {
         break;
 
       case 'true|false':
-        value = value.toLowerCase();
-        value = value !== 'false' && value !== '0';
+        if (c.cli.startsWith('ignore')) value = !value;
         break;
 
       case 'nodelist':

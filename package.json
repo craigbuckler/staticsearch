@@ -1,6 +1,6 @@
 {
   "name": "staticsearch",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Simple static site search system.",
   "type": "module",
   "main": "index.js",
@@ -47,7 +47,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "node-html-parser": "7.0.1"
+    "concol": "2.1.0",
+    "node-html-parser": "7.0.1",
+    "perfpro": "0.2.0"
   },
   "devDependencies": {
     "esbuild": "0.25.5",

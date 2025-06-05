@@ -6,7 +6,7 @@ class StaticSearch {
 
   static path = (new URL( import.meta.url )).pathname.replace('__FILENAME__', '');
   static dbName = '__AGENT__';
-  static version = __VERSION__;
+  static version = '__VERSION__';
   static wordCrop = __WORDCROP__;
 
   #ready = false;       // initialized

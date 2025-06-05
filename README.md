@@ -83,8 +83,8 @@ StaticSearch can be configured using CLI arguments, environment variables, or a 
 |`domain`|`SITE_DOMAIN`|`.siteDomain`|site domain if links use full URL (`http://localhost`)|
 |`root`|`BUILD_ROOT`|`.buildRoot`|site root path (`/`)|
 |`indexfile`|`SITE_INDEXFILE`|`.siteIndexFile`|default index file (`index.html`)|
-|`robotfile`|`SITE_PARSEROBOTSFILE`|`.siteParseRobotsFile`|parse robot.txt Disallows (`true`)|
-|`robotmeta`|`SITE_PARSEROBOTSMETA`|`.siteParseRobotsMeta`|parse robot meta noindex (`true`)|
+|`ignorerobotfile`|`SITE_PARSEROBOTSFILE`|`.siteParseRobotsFile`|parse robot.txt Disallows (`true`)|
+|`ignorerobotmeta`|`SITE_PARSEROBOTSMETA`|`.siteParseRobotsMeta`|parse robot meta noindex (`true`)|
 |`dom`|`PAGE_DOMSELECTORS`|`.pageDOMSelectors`|comma-separated content DOM nodes (`main`)|
 |`domx`|`PAGE_DOMEXCLUDE`|`.pageDOMExclude`|comma-separated DOM nodes to exclude (`nav`)|
 |`language`|`LANGUAGE`|`.language`|language (`en`)|
@@ -119,9 +119,9 @@ The web root path is presumed to be `/`, so the file named `./build/index.html` 
 
 The HTML index file used as the default for directory paths is presumed to be `index.html`. You can change this to another filename if necessary (`indexfile`|`SITE_INDEXFILE`|`.siteIndexFile`).
 
-If `robotfile`|`SITE_PARSEROBOTSFILE`|`.siteParseRobotsFile` is `true`, StaticSearch parses the `robots.txt` file in the root of the build directory. It will not index any HTML file matching a `Disallow: /some-directory/` line below `User-agent: *` or `User-agent: staticsearch`.
+StaticSearch parses the `robots.txt` file in the root of the build directory and will not index any HTML file matching a `Disallow: /some-directory/` line below `User-agent: *` or `User-agent: staticsearch`. This can be disabled by setting `--ignorerobotfile`|`SITE_PARSEROBOTSFILE=false`|`.siteParseRobotsFile=false`.
 
-If `robotmeta`|`SITE_PARSEROBOTSMETA`|`.siteParseRobotsMeta` is `true`, StaticSearch will parse HTML `meta` tags. It will not index any HTML file where `content="noindex"` in `<meta name="robots">` or `<meta name="staticsearch">`.
+StaticSearch parses HTML `meta` tags and will not index any HTML file where `content="noindex"` in `<meta name="robots">` or `<meta name="staticsearch">`. This can be disabled by setting `--ignorerobotmeta`|`SITE_PARSEROBOTSMETA=false`|`.siteParseRobotsMeta=false`.
 
 
 ### Page indexing options
@@ -276,7 +276,7 @@ The following attributes can be added to the `<static-search>` element:
 
 * `title="<string>"` - activation instructions (clicking and Ctrl|Cmd + K is supported)
 * `label="<string>"` - the label on the search `<input>`
-* `minscore="<num>"` - only show pages with total relevency scores of this or above on results
+* `minscore="<num>"` - only show pages with total relevancy scores of this or above on results
 * `maxresults="<num>"` - show up to this number of pages on the results
 
 The web component uses the [bind module](#bind-module) so it provides the same functionality.
@@ -404,7 +404,7 @@ static-search {
 
 The JavaScript bind module can automatically or programmatically attach StaticSearch functionality to an HTML `<input>` and a result element. It provides functionality to handle:
 
-* input deboucing
+* input debouncing
 * results output
 * URL querystring and hash functionality when clicking a link and clicking back.
 
@@ -489,7 +489,7 @@ staticSearchResult( document.getElementById('myresult') );
 
 ### StaticSearch API
 
-Finally, you can directly use the StaticSearch JavaScript API to return an array of results for a specific search term:
+You can implement whatever input and output functionality or styling you require by directly using the StaticSearch JavaScript API. The `.find()` method returns an array of results for a specific search term:
 
 ```js
 import { staticsearch } from '/search/staticsearch.js';
@@ -523,4 +523,25 @@ Returns an array of page objects sorted by relevancy. Example:
 */
 ```
 
-You can therefore implement whatever input and output functionality or styling you require.
+
+### StaticSearch events
+
+However a search is initiated, `staticsearch:` events are triggered on the `document` property:
+
+```js
+// search started
+document.addEventListener('staticsearch:find', e => {
+
+  // get search term
+  const { search } = e.detail;
+
+});
+
+// search result available
+document.addEventListener('staticsearch:result', e => {
+
+  // get search term and result array
+  const { search, result } = e.detail;
+
+});
+```

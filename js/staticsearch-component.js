@@ -26,10 +26,12 @@ class StaticSearchWebComponent extends HTMLElement {
 
     // move click element to shadow DOM
     const searchLink = this.firstElementChild;
-    searchLink.setAttribute('part', 'startsearch');
 
-    // open shadow DOM
+    // attach shadow DOM
     this.attachShadow({ mode: 'open' });
+
+    if (!searchLink) return;
+    searchLink.setAttribute('part', 'startsearch');
 
     // load styles
     const link = document.createElement('link');
@@ -37,7 +39,7 @@ class StaticSearchWebComponent extends HTMLElement {
     link.href = `${StaticSearchWebComponent.path}css/component.css`;
     this.shadowRoot.appendChild(link);
 
-    // append link
+    // append opener link
     const opener = this.shadowRoot.appendChild(searchLink);
 
     // create dialog

@@ -2,7 +2,10 @@
 import { staticsearch } from './__SSDIR__/staticsearch.js';
 
 let queryString = 'q', queryCount = 0;
-const inputDebounce = 500;
+const
+  appName = '__AGENT__',
+  attached = Symbol(appName),
+  inputDebounce = 500;
 
 // detect bindable elements
 (() => {
@@ -64,11 +67,15 @@ export function staticSearchSetQuery( search, hash ) {
 // bind a search field to staticsearch
 export function staticSearchInput( field ) {
 
+  // already attached?
+  if (field[attached]) return;
+  field[attached] = true;
+
   // querystring
   if (field.name) queryString = field.name;
 
-  // query string set?
-  const qs = staticSearchQuery();
+  // query string or previous search set?
+  const qs = staticSearchQuery() || sessionStorage.getItem(appName) || '';
   if (qs) field.value = qs;
 
   // field value set
@@ -86,6 +93,7 @@ export function staticSearchInput( field ) {
   // do search
   function startSearch( search ) {
 
+    sessionStorage.setItem(appName, search);
     if (search.length < 2) return;
 
     staticsearch.find( search )
@@ -100,6 +108,10 @@ export function staticSearchInput( field ) {
 
 // bind staticsearch result to an output element
 export function staticSearchResult( element, minScore, maxResults, resultElement, messageTemplate, itemTemplate ) {
+
+  // already attached?
+  if (element[attached]) return;
+  element[attached] = true;
 
   // search value
   let search = '';

@@ -1,12 +1,21 @@
 import process from 'node:process';
 import { readdir, readFile, cp } from 'node:fs/promises';
 import { join, resolve, dirname, extname, sep } from 'node:path';
-import { performance } from 'node:perf_hooks';
+import crypto from 'node:crypto';
+
+import { PerfPro } from 'perfpro';
+import { ConCol } from 'concol';
 
 import { parseRobotsTxt, parseHTML } from './lib/parser.js';
 import { writePath, deletePath } from './lib/file.js';
 import { stemFilename, stemFunction, stopWords } from './lib/lang.js';
-import { log } from './lib/log.js';
+
+// performance handler
+const perf = new PerfPro('StaticSearch');
+
+// console logger
+export const concol = new ConCol('StaticSearch', 'cyan');
+
 
 // search indexer
 class StaticSearch {
@@ -49,8 +58,6 @@ class StaticSearch {
   // start indexing
   async index() {
 
-    this.#recPerf('total indexing time');
-
     // resolved working directories
     const
       workingBuildDir = resolve(process.cwd(), this.buildDir),
@@ -80,9 +87,14 @@ class StaticSearch {
     if (!Array.isArray(this.pageDOMExclude)) this.pageDOMExclude = this.pageDOMExclude.split(',');
     this.pageDOMExclude = this.pageDOMExclude.map(v => v.trim());
 
-    // find all HTML files and slugs
+    // find all HTML files
     let buildFile = (await readdir(workingBuildDir, { recursive: true }))
-      .filter(f => extname(f).toLowerCase().includes('.htm'))
+      .filter(f => extname(f).toLowerCase().includes('.htm'));
+
+    // record total number of HTML files
+    const totalHTMLfiles = buildFile.length;
+
+    buildFile = buildFile
       .map(file => {
 
         // determine full filename and slug
@@ -111,7 +123,7 @@ class StaticSearch {
     // read and parse HTML files but remove any with:
     // <meta name="robots" content="noindex">
     // <meta name="staticsearch" content="noindex">
-    this.#recPerf('parse HTML files');
+    perf.mark('HTML file parsing');
     const robotRe = new RegExp(`<meta.*name=.*(robots|${ this.#agent }).*noindex`, 'i');
 
     (await Promise.allSettled(
@@ -136,7 +148,7 @@ class StaticSearch {
           buildFile[idx].html = html;
         }
         else {
-          log(`Unable to parse HTML in ${ buildFile[idx].file }`, 'warn');
+          concol.warn(`Unable to parse HTML in ${ buildFile[idx].file }`);
         }
 
       }
@@ -147,22 +159,22 @@ class StaticSearch {
     buildFile = buildFile.filter(f => f.html);
 
     if (!buildFile.length) {
-      log(`no files available for indexing at ${ workingBuildDir }`);
+      concol.warn(`no files available for indexing at ${ workingBuildDir }`);
       return;
     }
 
     // sort by slug
     buildFile.sort((a, b) => a.slug > b.slug ? 1 : -1);
 
-    this.#recPerf('parse HTML files', true);
-    this.#recPerf('word scoring');
+    perf.mark('HTML file parsing');
+    perf.mark('word score calculations');
 
     const
       pageMap = new Map( buildFile.map((p, i) => [p.slug, i]) ),
       pageIndex = [],
       wordIndex = new Map();
 
-    // create search data stores
+    // create search word indexes
     buildFile.forEach((page, idx) => {
 
       // page data
@@ -209,8 +221,8 @@ class StaticSearch {
 
     });
 
-    this.#recPerf('word scoring', true);
-    this.#recPerf('write index files');
+    perf.mark('word score calculations');
+    perf.mark('index file writing');
 
     // output index files
     await deletePath(workingSearchDir);
@@ -219,7 +231,7 @@ class StaticSearch {
       wordList = [...wordIndex.keys()].sort(),
       wordFileList = [];
 
-    let curFile = null, wordFile = [];
+    let curFile = null, wordFile = [], wordHash = '';
 
     while (wordList.length) {
 
@@ -228,7 +240,8 @@ class StaticSearch {
       if (nextFile === curFile) {
 
         // get next item
-        wordFile.push( wordList.shift() );
+        const w = wordList.shift();
+        wordFile.push( w );
 
       }
 
@@ -245,7 +258,9 @@ class StaticSearch {
             wordOut[w] = Object.fromEntries( wordIndex.get(w) );
           });
 
-          await writePath(join(workingSearchDir, './data/', curFile + '.json'), JSON.stringify( wordOut, null, this.#JSONspacing ));
+          const out = JSON.stringify( wordOut, null, this.#JSONspacing );
+          await writePath(join(workingSearchDir, './data/', curFile + '.json'), out);
+          wordHash += out;
 
         }
 
@@ -255,6 +270,9 @@ class StaticSearch {
       }
 
     }
+
+    // generate index version cache
+    const version = crypto.createHash('sha1').update(wordHash).digest('hex');
 
     // page indexes
     await writePath(join(workingSearchDir, 'index.json'), JSON.stringify(
@@ -283,7 +301,7 @@ class StaticSearch {
           .replaceAll('__STEMFILE__', stemImport)
           .replaceAll('__AGENT__', this.#agent)
           .replaceAll('__FILENAME__', jsFile)
-          .replaceAll('__VERSION__', Math.ceil( +new Date() / 60000))
+          .replaceAll('__VERSION__', version)
           .replaceAll('__WORDCROP__', this.wordCrop);
 
         await writePath(join(workingSearchDir, jsFile), clientJS);
@@ -294,49 +312,27 @@ class StaticSearch {
     // copy CSS files
     await cp(join(workingStaticSite, './dist/css/'), join(workingSearchDir, './css/'), { recursive: true, force: true } );
 
-    this.#recPerf('write index files', true);
+    perf.mark('index file writing');
 
-    this.#recPerf('total indexing time', true);
+    concol.log(
 
-    this.#showMetrics();
+      [
+        'StaticSearch indexing complete\n',
 
-    log(`indexing complete
-       pages indexed: ${ String(pageIndex.length).padStart(5, ' ') }
-        unique words: ${ String(wordIndex.size).padStart(5, ' ') }
-         index files: ${ String(wordFileList.length + 1).padStart(5, ' ') }
-    `,
-    'info');
-  }
+        [ 'HTML files found', totalHTMLfiles ],
+        [ 'HTML files excluded', totalHTMLfiles - pageIndex.length ],
+        [ 'HTML files indexed', pageIndex.length ],
+        [ 'unique words indexed', wordIndex.size ],
+        [ 'index files created', wordFileList.length + 1 ],
 
+        '',
 
-  // record performance metric
-  #recPerf(name, done = false) {
-    performance.mark(`[${ this.#agent }] ${ name }:${ done ? 1 : 0 }`);
-  }
+        [ 'total indexing time', perf.now(), ' ms' ],
+        ...perf.allDurations().map(p => [ p.name, p.duration, ' ms']),
 
+      ]
 
-  // log performance metrics
-  #showMetrics() {
-
-    const metrics = new Set(
-      [...performance.getEntries()]
-        .filter( p => p.name.startsWith(`[${ this.#agent }] `))
-        .map( p => p.name.replace(/:.$/i, '') )
     );
-
-    let msg = '';
-    metrics.forEach(m => {
-
-      const p = Math.ceil( performance.measure(m, m + ':0', m + ':1').duration );
-      msg += m.slice( this.#agent.length + 3 ).padStart(20,' ') + ':' + String(p).padStart(6, ' ') + 'ms\n';
-
-      performance.clearMarks(m + ':0');
-      performance.clearMarks(m + ':1');
-      performance.clearMeasures(m);
-
-    });
-
-    log(msg, 'info');
 
   }
 
