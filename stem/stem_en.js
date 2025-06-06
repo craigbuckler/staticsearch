@@ -61,7 +61,7 @@ export function stem(word) {
   }
 
   // some words have predefined stem forms
-  if (special[word]) {
+  if (Object.hasOwn(special, word)) {
     return special[word];
   }
 

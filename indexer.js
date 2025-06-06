@@ -64,6 +64,8 @@ class StaticSearch {
       workingSearchDir = resolve(process.cwd(), this.searchDir),
       workingStaticSite = resolve( '/', dirname( import.meta.url.replace(/^[^/]*\/+/, '') ) );
 
+    concol.log(['StaticSearch indexing started', '', ['processing HTML files in', workingBuildDir], ['writing index data to', workingSearchDir], '' ]);
+
     // set language, stem and stopword
     this.language = (this.language || 'en').trim().toLowerCase();
     this.wordCrop = Math.max(3, parseFloat(this.wordCrop) || 7);

@@ -45,7 +45,15 @@ Several JavaScript-only static search options are available, but:
 * most require you to programmatically add content in specific formats
 * [Pagefind](https://pagefind.app/) provides more advanced WASM-based indexing, but it has a fairly heavy JavaScript payload and there are issues using strict [Content Security Policies](https://developer.mozilla.org/docs/Web/HTTP/Guides/CSP).
 
-StaticSearch offers a simpler indexing process with minimal code. For a typical 100-page site, it requires 80Kb of data and JavaScript (before gzipping). 50Kb of that is word index data loaded incrementally as you search. Downloaded data is cached in [IndexedDB](https://github.com/craigbuckler/pixdb) so search results become faster the more searches you do.
+StaticSearch offers a simpler indexing process and generates minimal code.
+
+* 13Kb of JavaScript and 4Kb of CSS is provided for the [web component](#web-component). Sites just using the [bind module](#bind-module) require 8Kb of JavaScript. Sites directly using the [API](#staticsearch-api) require 6Kb of JavaScript.
+
+* A typical 100 page site is indexed in less than one second and generates 100Kb of word data.
+
+* A typical 1,000 page site is indexed in less than six seconds and generates 800Kb of word data.
+
+Index data is incrementally loaded on demand as you search for different words. Indexes are cached in [IndexedDB](https://www.npmjs.com/package/pixdb) so results appear faster the more searches you do.
 
 StaticSearch weights words according to their location in headings, content, links etc. To keep it lightweight, it does not store full text indexes or other factors, but the results work well on smaller sites.
 

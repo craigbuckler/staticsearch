@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.1 - 2025-06-06](#021---2025-06-06)
+
+* fixed Windows issue with dynamically loaded stem function
+* fixed issue checking JavaScript reserved words in `stem_en.js`
+* log shows indexing has started
+* minor help updates
+
+
 ## [0.2.0 - 2025-06-05](#020---2025-06-05)
 
 * the previous search is remembered when navigating to other pages

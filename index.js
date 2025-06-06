@@ -104,16 +104,14 @@ ${
     .join('\n')
 }
 
-Options can use "--name value" or "--name=value" format.
-
 Examples:
 
-  staticsearch --builddir=./dest/ --root /blog/ --indexfile default.htm
-  staticsearch --domain http://site.com --searchdir=./build/find/
+  staticsearch --builddir ./dest/ --root /blog/ --indexfile default.htm
+  staticsearch --domain http://site.com -s ./build/find/
 
 The first non-dashed parameter is presumed to be the build directory:
 
-  staticsearch ./dest/ --searchdir=./dest/search/
+  staticsearch ./dest/ --searchdir ./dest/search/
 
 `);
 }
