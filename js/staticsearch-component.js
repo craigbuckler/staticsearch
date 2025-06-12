@@ -109,8 +109,10 @@ class StaticSearchWebComponent extends HTMLElement {
     // bind search result
     staticSearchResult(
       this.#results,
-      this.getAttribute('minscore'),
-      this.getAttribute('maxresults')
+      {
+        minScore: this.getAttribute('minscore'),
+        maxResults: this.getAttribute('maxresults')
+      }
     );
 
     // bind search input

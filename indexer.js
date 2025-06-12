@@ -14,7 +14,7 @@ import { stemFilename, stemFunction, stopWords } from './lib/lang.js';
 const perf = new PerfPro('StaticSearch');
 
 // console logger
-export const concol = new ConCol('StaticSearch', 'cyan');
+export const concol = new ConCol('StaticSearch', 'magentaBright');
 
 
 // search indexer
@@ -180,7 +180,11 @@ class StaticSearch {
     buildFile.forEach((page, idx) => {
 
       // page data
-      pageIndex[idx] = { u: page.slug, t: page.html.title, d: page.html.description };
+      pageIndex[idx] = { u: page.slug };
+      if (page.html.title) pageIndex[idx].t = page.html.title;
+      if (page.html.description) pageIndex[idx].d = page.html.description;
+      if (page.html.date) pageIndex[idx].p = page.html.date;
+      if (page.html.wordcount) pageIndex[idx].w = page.html.wordcount;
 
       // title scores
       addWords( page.html.word.title, idx, this.wordWeight.title );
@@ -331,6 +335,8 @@ class StaticSearch {
 
         [ 'total indexing time', perf.now(), ' ms' ],
         ...perf.allDurations().map(p => [ p.name, p.duration, ' ms']),
+
+        '',
 
       ]
 

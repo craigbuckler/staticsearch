@@ -2,30 +2,43 @@
 // https://gist.github.com/chrisdc/8c608e67432a6cdd2d89aa7131ec133d
 
 const
-  special = {
-    skis: 'ski',
-    skies: 'sky',
-    dying: 'die',
-    lying: 'lie',
-    tying: 'tie',
-    idly: 'idl',
-    gently: 'gentl',
-    ugly: 'ugli',
-    early: 'earli',
-    only: 'onli',
-    singly: 'singl'
-  },
+  special = new Map([
+    [ 'skis', 'ski' ],
+    [ 'skies', 'sky' ],
+    [ 'dying', 'die' ],
+    [ 'lying', 'lie' ],
+    [ 'tying', 'tie' ],
+    [ 'idly', 'idl' ],
+    [ 'gently', 'gentl' ],
+    [ 'ugly', 'ugli' ],
+    [ 'early', 'earli' ],
+    [ 'only', 'onli' ],
+    [ 'singly', 'singl' ],
+  ]),
 
-  exceptions = [
+  exceptions = new Set([
     'sky', 'news', 'howe', 'atlas', 'cosmos', 'bias', 'andes'
-  ],
+  ]),
 
-  exceptions1a = [
+  exceptions1a = new Set([
     'inning', 'outing', 'canning', 'herring', 'earring', 'proceed', 'exceed', 'succeed'
-  ],
+  ]),
 
-  doubles = ['bb', 'dd', 'ff', 'gg', 'mm', 'nn', 'pp', 'rr', 'tt'];
+  doubles = new Set(['bb', 'dd', 'ff', 'gg', 'mm', 'nn', 'pp', 'rr', 'tt']),
 
+  sb1Suffix = new Set(['at', 'bl', 'iz']),
+
+  reReplaceY = /^y|([aeiouy])y/,
+  reResetY = /Y/,
+  reReplaceApos = /^'/,
+  reShort = /(^[aeiouy][^aeiouy])|([aeiouy][^aeiouywxY]$)/,
+  regionRegex1 = /^(gener|commun|arsen)(\w*?[aeiouy][^aeiouy])?(\w*)$/,
+  regionRegex2 = /^(\w*?[aeiouy][^aeiouy])(\w*?[aeiouy][^aeiouy])?(\w*)$/,
+  reStep0 = /'s'$|'s$|'$/,
+  reStep1c = /(\w+[^aeiouy])([yY])$/;
+
+
+// suffix handler
 function handleSuffix(word, patterns) {
   var wordLen = word.length;
 
@@ -42,9 +55,10 @@ function handleSuffix(word, patterns) {
   return word;
 }
 
+// short handler
 function isShort(word, r1) {
   if (!word[r1]) {
-    return /(^[aeiouy][^aeiouy])|([aeiouy][^aeiouywxY]$)/.test(word);
+    return reShort.test(word);
   }
   return false;
 }
@@ -56,24 +70,22 @@ export function stem(word) {
   var r1, r2;
 
   // 1 or 2 letter words (and some other exceptions) are returned unchanged
-  if (word.length <= 2 || exceptions.indexOf(word) !== -1) {
+  if (word.length <= 2 || exceptions.has(word)) {
     return word;
   }
 
   // some words have predefined stem forms
-  if (Object.hasOwn(special, word)) {
-    return special[word];
+  if (special.has(word)) {
+    return special.get(word);
   }
 
   // replace y
-  word = word.replace(/^y|([aeiouy])y/, '$1Y');
+  word = word.replace(reReplaceY, '$1Y');
 
   // remove initial '
-  word = word.replace(/^'/, '');
+  word = word.replace(reReplaceApos, '');
 
   // find regions
-  const regionRegex1 = /^(gener|commun|arsen)(\w*?[aeiouy][^aeiouy])?(\w*)$/;
-  const regionRegex2 = /^(\w*?[aeiouy][^aeiouy])(\w*?[aeiouy][^aeiouy])?(\w*)$/;
   var match = regionRegex1.exec(word) || regionRegex2.exec(word) || [];
 
   // R1
@@ -91,7 +103,7 @@ export function stem(word) {
   }
 
   // step 0
-  word = word.replace(/'s'$|'s$|'$/, '');
+  word = word.replace(reStep0, '');
 
   // step 1a
   word = handleSuffix(word, [
@@ -103,7 +115,7 @@ export function stem(word) {
   ]);
 
   // recheck exceptions
-  if (exceptions1a.indexOf(word) !== -1) {
+  if (exceptions1a.has(word)) {
     return word;
   }
 
@@ -118,7 +130,7 @@ export function stem(word) {
   ]);
 
   // step 1c
-  word = word.replace(/(\w+[^aeiouy])([yY])$/, '$1i');
+  word = word.replace(reStep1c, '$1i');
 
   if (r1 !== Infinity) {
     // step 2
@@ -179,7 +191,7 @@ export function stem(word) {
   }
 
   // reset Y
-  word = word.replace(/Y/, 'y');
+  word = word.replace(reResetY, 'y');
 
   return word;
 
@@ -189,9 +201,9 @@ export function stem(word) {
     var result = p1;
     var suffix = result.substring(result.length - 2);
 
-    if (['at', 'bl', 'iz'].indexOf(suffix) !== -1) {
+    if (sb1Suffix.has(suffix)) {
       result = result + 'e';
-    } else if (doubles.indexOf(suffix) !== -1) {
+    } else if (doubles.has(suffix)) {
       result = result.substring(0, result.length - 1);
     } else if (isShort(result, r1)) {
       result = result + 'e';

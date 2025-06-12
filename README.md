@@ -321,12 +321,18 @@ Search results are shown in an ordered list `<ol part="searchresult">`. The foll
 <li part="item">
   <a part="link">
     <h2 part="title"></h2>
+    <p part="meta">
+      <time part="date"></time> &ndash;
+      <span part="words">0</span> words
+    </p>
     <p part="description"></p>
   </a>
 </li>
 ```
 
-You can override this using a `<template>` with an ID of `staticsearch_item` in your HTML page (it can be within `<static-search>` or anywhere else). It can set the `part` attributes `"item"`, `"link"`, `"title"`, and `"description"` as necessary, e.g. show the title but no description in an `<article>`:
+Note that the date and word count number are formatted for the user's locale.
+
+You can override this using a `<template>` with an ID of `staticsearch_item` in your HTML page (it can be within `<static-search>` or anywhere else). Set the `part` attributes `"item"`, `"link"`, `"title"`, `meta`, `date`, `words`, and `"description"` as necessary, e.g. show the title but no meta values or description in an `<article>`:
 
 ```html
 <template id="staticsearch_item">
@@ -360,8 +366,9 @@ The following CSS custom properties (variables) can be set in the `:root` or any
   --staticsearch-color-back: Canvas;
   --staticsearch-color-border: ButtonFace;
 
-  --staticsearch-color-fore: CanvasText;
-  --staticsearch-color-dim: color-mix(in oklab, CanvasText 70%, Canvas);
+  --staticsearch-color-fore0: CanvasText;
+  --staticsearch-color-fore1: color-mix(in oklab, CanvasText 80%, Canvas);
+  --staticsearch-color-fore2: color-mix(in oklab, CanvasText 60%, Canvas);
 
   --staticsearch-color-link: color-mix(in oklab, LinkText 70%, CanvasText);
   --staticsearch-color-visited: color-mix(in oklab, VisitedText 70%, CanvasText);
@@ -434,6 +441,11 @@ The following example automatically binds input and results elements without fur
 </search>
 ```
 
+The `staticsearch_result` element can set optional attributes:
+
+* `minscore="<num>"` - only show pages with total relevancy scores of this or above on results
+* `maxresults="<num>"` - show up to this number of pages on the results
+
 As [shown above](#overriding-html-templates), you can set your own HTML `<template>`s and style anything as you like:
 
 ```html
@@ -455,7 +467,10 @@ As [shown above](#overriding-html-templates), you can set your own HTML `<templa
   <template id="staticsearch_item">
     <li part="item">
       <article>
-        <h2 part="title"><a part="link"></a></h2>
+        <h2 part="title">
+          <a part="link"></a>,
+          <time part="date"></time>
+        </h2>
       </article>
     </li>
   </template>
@@ -483,16 +498,15 @@ staticSearchInput( document.getElementById('mysearch') );
 staticSearchResult( document.getElementById('myresult') );
 ```
 
-`staticSearchInput()` has a single parameter with the input element.
+`staticSearchInput(element)` is passed the input element.
 
-`staticSearchResult()` has the following parameters:
+`staticSearchResult(element, options)` is passed the result element and an optional options object with the following properties:
 
-* `element` - the result element (required)
-* `minScore` - only show pages with total word scores of this or above on results
-* `maxResults` - show up to this number of pages on the results
-* `resultElement` - the outer list element (defaults to `ol`)
-* `messageTemplate` - a DOM `<template>` configuring the results message
-* `itemTemplate` - a DOM `<template>` configuring a result item
+* `.minScore` - only show pages with total word scores of this or above on results
+* `.maxResults` - show up to this number of pages on the results
+* `.resultElement` - the outer list element (defaults to `ol`)
+* `.messageTemplate` - a DOM `<template>` configuring the results message
+* `.itemTemplate` - a DOM `<template>` configuring a result item
 
 
 ### StaticSearch API
@@ -511,6 +525,8 @@ Returns an array of page objects sorted by relevancy. Example:
     "url": "/news/search-engine-optimization/",
     "title": "Do Publican sites rank better?",
     "description": "Do static sites rank better in search engines?",
+    "date": "2025-01-31",
+    "words": 1234
     "relevancy": 21
   },
   {
@@ -518,6 +534,8 @@ Returns an array of page objects sorted by relevancy. Example:
     "url": "/docs/recipe/feeds/txt-sitemap/",
     "title": "Create a text sitemap",
     "description": "How to output a list of all pages for search engines.",
+    "date": "2025-02-01",
+    "words": 954
     "relevancy": 12
   },
   {
@@ -525,6 +543,8 @@ Returns an array of page objects sorted by relevancy. Example:
     "url": "/news/site-performance/",
     "title": "Are static sites fast?",
     "description": "Static sites typically perform better than others.",
+    "date": "2025-02-22",
+    "words": 222
     "relevancy": 2
   }
 ]

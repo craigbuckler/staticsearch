@@ -14,14 +14,15 @@
   --colback0: var(--staticsearch-color-back, Canvas);
   --colbord0: var(--staticsearch-color-border, ButtonFace);
 
-  --colfore0: var(--staticsearch-color-fore, CanvasText);
-  --colfore1: var(--staticsearch-color-dim, color-mix(in oklab, CanvasText 70%, Canvas));
+  --colfore0: var(--staticsearch-color-fore0, CanvasText);
+  --colfore1: var(--staticsearch-color-fore1, color-mix(in oklab, CanvasText 80%, Canvas));
+  --colfore2: var(--staticsearch-color-fore2, color-mix(in oklab, CanvasText 60%, Canvas));
 
-  --collinkd: var(--staticsearch-color-link, color-mix(in oklab, LinkText 70%, CanvasText));
-  --collinkv: var(--staticsearch-color-visited, color-mix(in oklab, VisitedText 70%, CanvasText));
+  --collinkd: var(--staticsearch-color-link, color-mix(in oklab, LinkText 80%, CanvasText));
+  --collinkv: var(--staticsearch-color-visited, color-mix(in oklab, VisitedText 80%, CanvasText));
 
   --colshad0: var(--staticsearch-color-shadow, #000);
-  --colshad1: var(--staticsearch-color-backdrop, color-mix(in srgb, var(--colshad0), transparent 30%));
+  --colshad1: var(--staticsearch-color-backdrop, color-mix(in srgb, var(--colshad0), transparent 25%));
   --colblur0: var(--staticsearch-backdrop-blur, 3px);
 
 }

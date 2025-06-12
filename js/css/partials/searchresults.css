@@ -39,8 +39,14 @@
   margin-block-end: 0.1em;
 }
 
+[part="meta"] {
+  font-size: 0.75em;
+  line-height: 1.4;
+  color: var(--colfore2);
+}
+
 [part="description"] {
-  font-size: 0.8em;
+  font-size: 0.85em;
   line-height: 1.4;
   text-wrap: pretty;
   color: var(--colfore1);
@@ -70,9 +76,4 @@ a:hover, a:focus, a:active {
   [part="title"] {
     text-decoration: underline;
   }
-
-  [part="description"] {
-    color: var(--colfore0);
-  }
-
 }

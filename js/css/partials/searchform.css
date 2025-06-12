@@ -48,12 +48,12 @@
 
 input[part="searchinput"] {
   display: block;
-  width: 100%;
+  inline-size: 100%;
   line-height: 1.5;
   padding-block: 0.2em;
   padding-inline: 0.5em;
   color: var(--colfore1);
-  background-color: var(--colback0);
+  background-color: transparent;
   border: 1px solid transparent;
   border-radius: 3px;
   outline-style: none;

@@ -5,7 +5,11 @@ let queryString = 'q', queryCount = 0;
 const
   appName = '__AGENT__',
   attached = Symbol(appName),
-  inputDebounce = 500;
+  inputDebounce = 500,
+  format = {
+    date: new Intl.DateTimeFormat([], { dateStyle: 'long' }).format,
+    number: new Intl.NumberFormat([], { maximumFractionDigits: 0 }).format
+  };
 
 // detect bindable elements
 (() => {
@@ -19,8 +23,10 @@ const
     // bind result
     staticSearchResult(
       searchResult,
-      searchResult.getAttribute('minscore'),
-      searchResult.getAttribute('maxresults')
+      {
+        minScore: searchResult.getAttribute('minscore'),
+        maxResults: searchResult.getAttribute('maxresults')
+      }
     );
 
   }
@@ -107,7 +113,7 @@ export function staticSearchInput( field ) {
 
 
 // bind staticsearch result to an output element
-export function staticSearchResult( element, minScore, maxResults, resultElement, messageTemplate, itemTemplate ) {
+export function staticSearchResult( element, opt = {} ) {
 
   // already attached?
   if (element[attached]) return;
@@ -116,11 +122,13 @@ export function staticSearchResult( element, minScore, maxResults, resultElement
   // search value
   let search = '';
 
-  minScore = parseFloat(minScore) || 0;
-  maxResults = parseFloat(maxResults) || 0;
+  const
+    minScore = parseFloat(opt.minScore) || 0,
+    maxResults = parseFloat(opt.maxResults) || 0,
+    resultElement = opt.resultElement || 'ol';
 
   // create default message template
-  messageTemplate = messageTemplate || document.getElementById('staticsearch_resultmessage');
+  let messageTemplate = opt.messageTemplate || document.getElementById('staticsearch_resultmessage');
 
   if (!messageTemplate) {
     messageTemplate = document.createElement('template');
@@ -128,11 +136,11 @@ export function staticSearchResult( element, minScore, maxResults, resultElement
   }
 
   // create default item template
-  itemTemplate = itemTemplate || document.getElementById('staticsearch_item');
+  let itemTemplate = opt.itemTemplate || document.getElementById('staticsearch_item');
 
   if (!itemTemplate) {
     itemTemplate = document.createElement('template');
-    itemTemplate.innerHTML = '<li part="item"><a part="link"><h2 part="title"></h2><p part="description"></p></a></li>';
+    itemTemplate.innerHTML = '<li part="item"><a part="link"><h2 part="title"></h2><p part="meta"><time part="date"></time> &ndash; <span part="words">0</span> words</p><p part="description"></p></a></li>';
   }
 
 
@@ -158,7 +166,7 @@ export function staticSearchResult( element, minScore, maxResults, resultElement
     element.innerHTML = '';
 
     // generate results list
-    const list = document.createElement(resultElement || 'ol');
+    const list = document.createElement( resultElement );
     list.setAttribute('part', 'searchresult');
 
     // and items
@@ -170,6 +178,8 @@ export function staticSearchResult( element, minScore, maxResults, resultElement
       updateNode(template, 'link', null, { href: item.url, id: `staticsearchresult-${ item.id }` });
       updateNode(template, 'title', item.title);
       updateNode(template, 'description', item.description);
+      if (item.date) updateNode(template, 'date', format.date( new Date(item.date) ), { datetime: item.date });
+      if (item.words) updateNode(template, 'words', format.number( item.words ));
 
       list.appendChild(template);
 

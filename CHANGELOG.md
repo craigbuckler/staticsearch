@@ -1,5 +1,17 @@
 # Changelog
 
+
+## [0.3.0 - 2025-06-12](#030---2025-06-12)
+
+* extracts information in [schema.org structured data](https://schema.org/) when possible
+* indexes and displays page dates and word counts
+* `staticSearchResult()` now accepts an options object parameter
+* indexer removes words found in code elements
+* slightly faster and more robust English stemming algorithm
+* development terms removed from English stop words
+* minor CSS tweaks
+
+
 ## [0.2.1 - 2025-06-06](#021---2025-06-06)
 
 * fixed Windows issue with dynamically loaded stem function

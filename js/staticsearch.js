@@ -81,7 +81,7 @@ class StaticSearch {
     // write page data
     await this.#db.add({
       store: 'page',
-      item: i.page.map((p, id) => ({ id, url: p.u, title: p.t, description: p.d }))
+      item: i.page.map((p, id) => ({ id, url: p.u, title: p.t || p.u, description: p.d || '', date: p.p || '', words: p.w || 0 }))
     });
 
     // write file data
