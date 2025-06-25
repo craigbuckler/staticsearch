@@ -14,7 +14,7 @@ import { stemFilename, stemFunction, stopWords } from './lib/lang.js';
 const perf = new PerfPro('StaticSearch');
 
 // console logger
-export const concol = new ConCol('StaticSearch', 'magentaBright');
+export let concol = new ConCol('StaticSearch', 'magentaBright');
 
 
 // search indexer
@@ -30,7 +30,7 @@ class StaticSearch {
   wordCrop = process.env.WORDCROP;
   stopWords = process.env.STOPWORDS;
   buildDir = process.env.BUILD_DIR || './build/';
-  searchDir = process.env.SEARCH_DIR || './build/search/';
+  searchDir = process.env.SEARCH_DIR || join(this.buildDir, 'search/');
   buildRoot = process.env.BUILD_ROOT || '/';
   siteDomain = process.env.SITE_DOMAIN || 'http://localhost';
   siteIndexFile = process.env.SITE_INDEXFILE || 'index.html';
@@ -38,8 +38,8 @@ class StaticSearch {
   siteParseRobotsFile = (process.env.SITE_PARSEROBOTSFILE?.toLowerCase() !== 'false');
   siteParseRobotsMeta = (process.env.SITE_PARSEROBOTSMETA?.toLowerCase() !== 'false');
 
-  pageDOMSelectors = (process.env.PAGE_DOMSELECTORS || 'main');
-  pageDOMExclude = (process.env.PAGE_DOMEXCLUDE || 'nav');
+  pageDOMSelectors = (process.env.PAGE_DOMSELECTORS || '');
+  pageDOMExclude = (process.env.PAGE_DOMEXCLUDE || '');
 
   wordWeight = {
     title:        parseFloat(process.env.WEIGHT_TITLE  || 10),
@@ -55,6 +55,8 @@ class StaticSearch {
     link:         parseFloat(process.env.WEIGHT_LINK || 5)
   };
 
+  logLevel = process.env.LOGLEVEL || 2;
+
   // start indexing
   async index() {
 
@@ -64,7 +66,8 @@ class StaticSearch {
       workingSearchDir = resolve(process.cwd(), this.searchDir),
       workingStaticSite = resolve( '/', dirname( import.meta.url.replace(/^[^/]*\/+/, '') ) );
 
-    concol.log(['StaticSearch indexing started', '', ['processing HTML files in', workingBuildDir], ['writing index data to', workingSearchDir], '' ]);
+    concol = new ConCol('StaticSearch', 'magentaBright', parseFloat(this.logLevel) || 0);
+    concol.log(['StaticSearch indexing started', '', ['processing HTML files in', workingBuildDir], ['writing index data to', workingSearchDir], '' ], 1);
 
     // set language, stem and stopword
     this.language = (this.language || 'en').trim().toLowerCase();
@@ -81,13 +84,13 @@ class StaticSearch {
       this.siteParseRobotsFile
     );
 
-    // parse DOM selectors
+    // parse DOM selectors array/string
     if (!Array.isArray(this.pageDOMSelectors)) this.pageDOMSelectors = this.pageDOMSelectors.split(',');
-    this.pageDOMSelectors = this.pageDOMSelectors.map(v => v.trim());
+    this.pageDOMSelectors = this.pageDOMSelectors.map(v => v.trim()).filter(v => v).join(',');
 
-    // parse DOM exclusions
+    // parse DOM exclusions array/string
     if (!Array.isArray(this.pageDOMExclude)) this.pageDOMExclude = this.pageDOMExclude.split(',');
-    this.pageDOMExclude = this.pageDOMExclude.map(v => v.trim());
+    this.pageDOMExclude = this.pageDOMExclude.map(v => v.trim()).filter(v => v).join(',');
 
     // find all HTML files
     let buildFile = (await readdir(workingBuildDir, { recursive: true }))
@@ -126,7 +129,7 @@ class StaticSearch {
     // <meta name="robots" content="noindex">
     // <meta name="staticsearch" content="noindex">
     perf.mark('HTML file parsing');
-    const robotRe = new RegExp(`<meta.*name=.*(robots|${ this.#agent }).*noindex`, 'i');
+    const robotRe = new RegExp(`<head.+<meta[^>]*name=[^>]*(robots|${ this.#agent })[^>]*noindex.+</head>`, 'is');
 
     (await Promise.allSettled(
       buildFile.map(f => readFile( f.file, { encoding: 'utf8' } ) )
@@ -150,7 +153,7 @@ class StaticSearch {
           buildFile[idx].html = html;
         }
         else {
-          concol.warn(`Unable to parse HTML in ${ buildFile[idx].file }`);
+          concol.warn(`Unable to parse HTML in ${ buildFile[idx].file }`, 2);
         }
 
       }
@@ -161,7 +164,7 @@ class StaticSearch {
     buildFile = buildFile.filter(f => f.html);
 
     if (!buildFile.length) {
-      concol.warn(`no files available for indexing at ${ workingBuildDir }`);
+      concol.warn(`no files available for indexing at ${ workingBuildDir }`, 2);
       return;
     }
 
@@ -338,7 +341,8 @@ class StaticSearch {
 
         '',
 
-      ]
+      ],
+      1
 
     );
 

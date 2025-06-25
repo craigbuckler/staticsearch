@@ -17,8 +17,8 @@ const
     { env: 'SITE_INDEXFILE',        cli: 'indexfile',       clis: 'i',    prop: 'siteIndexFile',          type: 'name',         default: 'index.html',        help: 'default index file' },
     { env: 'SITE_PARSEROBOTSFILE',  cli: 'ignorerobotfile', clis: 'f',    prop: 'siteParseRobotsFile',    type: 'true|false',   default: true,                help: 'parse robot.txt Disallows' },
     { env: 'SITE_PARSEROBOTSMETA',  cli: 'ignorerobotmeta', clis: 'm',    prop: 'siteParseRobotsMeta',    type: 'true|false',   default: true,                help: 'parse robot meta noindex' },
-    { env: 'PAGE_DOMSELECTORS',     cli: 'dom',             clis: 'D',    prop: 'pageDOMSelectors',       type: 'nodelist',     default: 'main',              help: 'comma-separated content DOM nodes' },
-    { env: 'PAGE_DOMEXCLUDE',       cli: 'domx',            clis: 'X',    prop: 'pageDOMExclude',         type: 'nodelist',     default: 'nav',               help: 'comma-separated DOM nodes to exclude' },
+    { env: 'PAGE_DOMSELECTORS',     cli: 'dom',             clis: 'D',    prop: 'pageDOMSelectors',       type: 'str',          default: '',                  help: 'CSS selector: nodes to include' },
+    { env: 'PAGE_DOMEXCLUDE',       cli: 'domx',            clis: 'X',    prop: 'pageDOMExclude',         type: 'str',          default: '',                  help: 'CSS selector: nodes to exclude' },
     { env: 'LANGUAGE',              cli: 'language',        clis: 'l',    prop: 'language',               type: 'str',          default: 'en',                help: 'language' },
     { env: 'WORDCROP',              cli: 'wordcrop',        clis: 'c',    prop: 'wordCrop',               type: 'num',          default: 7,                   help: 'crop word letters' },
     { env: 'STOPWORDS',             cli: 'stopwords',       clis: 'S',    prop: 'stopWords',              type: 'str',          default: null,                help: 'comma-separated list of stop words' },
@@ -33,12 +33,13 @@ const
     { env: 'WEIGHT_EMPHASIS',       cli: 'weightemphasis',  clis: '',     prop: 'wordWeight.emphasis',    type: 'num',          default: 2,                   help: 'word weight for bold and italic' },
     { env: 'WEIGHT_ALT',            cli: 'weightalt',       clis: '',     prop: 'wordWeight.alt',         type: 'num',          default: 1,                   help: 'word weight for alt tags' },
     { env: 'WEIGHT_CONTENT',        cli: 'weightcontent',   clis: '',     prop: 'wordWeight.content',     type: 'num',          default: 1,                   help: 'word weight for content' },
+    { env: 'LOGLEVEL',              cli: 'loglevel',        clis: 'L',    prop: 'logLevel',               type: 'num',          default: 2,                   help: 'logging verbosity' },
     { env: null,                    cli: 'version',         clis: 'v',    prop: null,                     type: null,           default: null,                help: 'show application version' },
     { env: null,                    cli: 'help',            clis: '?',    prop: null,                     type: null,           default: null,                help: 'show help' },
     { env: null,                    cli: 'helpenv',         clis: 'E',    prop: null,                     type: null,           default: null,                help: 'show .env/environment variable help' },
     { env: null,                    cli: 'helpapi',         clis: 'A',    prop: null,                     type: null,           default: null,                help: 'show Node.js API help' },
   ],
-  helpLink = styleText(['cyanBright'], 'For help, refer to https://github.com/craigbuckler/staticsearch');
+  helpLink = styleText(['cyanBright'], 'For full help, refer to https://publican.dev/staticsearch/');
 
 // default options
 let opt = { help: true };
@@ -224,12 +225,12 @@ config.forEach(c => {
         value = parseFloat(value);
         break;
 
-      case 'true|false':
-        if (c.cli.startsWith('ignore')) value = !value;
+      case 'str':
+        value = value.trim();
         break;
 
-      case 'nodelist':
-        value = value.split(',').map(v => v.trim());
+      case 'true|false':
+        if (c.cli.startsWith('ignore')) value = !value;
         break;
 
     }

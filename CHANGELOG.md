@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.4.0 - 2025-06-25](#040---2025-06-25)
+
+* improved content indexing when no HTML `<main>` element is found
+* set a log verbosity level: `0` errors only, `1` errors, status, or `2` all
+* when no `searchdir` is set, the default is a `search` sub-directory of the `builddir`
+* fixed issue where a `noindex` meta tag could be found on minified HTML
+* smaller README with a link to documentation at [publican.dev/staticsearch/](https://publican.dev/staticsearch/)
+* [ConCol](https://www.npmjs.com/package/concol) update
+
 
 ## [0.3.0 - 2025-06-12](#030---2025-06-12)
 
