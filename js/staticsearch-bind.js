@@ -24,6 +24,7 @@ const
     staticSearchResult(
       searchResult,
       {
+        minFound: searchResult.getAttribute('minfound'),
         minScore: searchResult.getAttribute('minscore'),
         maxResults: searchResult.getAttribute('maxresults')
       }
@@ -123,6 +124,7 @@ export function staticSearchResult( element, opt = {} ) {
   let search = '';
 
   const
+    minFound = parseFloat(opt.minFound) || 0,
     minScore = parseFloat(opt.minScore) || 0,
     maxResults = parseFloat(opt.maxResults) || 0,
     resultElement = opt.resultElement || 'ol';
@@ -172,7 +174,7 @@ export function staticSearchResult( element, opt = {} ) {
     // and items
     res.forEach( (item, idx) => {
 
-      if ((minScore && item.relevancy < minScore) || (maxResults && idx >= maxResults)) return;
+      if (item.found < minFound || (minScore && item.relevancy < minScore) || (maxResults && idx >= maxResults)) return;
 
       const template = itemTemplate.content.cloneNode(true);
       updateNode(template, 'link', null, { href: item.url, id: `staticsearchresult-${ item.id }` });

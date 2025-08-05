@@ -107,11 +107,11 @@ class StaticSearch {
     search = search.trim();
     this.#triggerEvent('find', { search });
 
-    const result = [], searchWords = [ ...this.wordList(search) ];
+    const result = [], searchWords = [ ...this.wordList(search) ], searchWordCount = searchWords.length;
 
     console.log('[search] for:', searchWords);
 
-    if (!searchWords.length) {
+    if (!searchWordCount) {
       this.#triggerEvent('result', { search, result });
       return result;
     }
@@ -124,15 +124,16 @@ class StaticSearch {
     console.log('[search] GETTING SCORES');
 
     // get page scores and calculate relevancy
-    const rel = {};
+    const score = {};
     (await Promise.allSettled(
       searchWords.map( key => this.#db.get({ store: 'index', key }) )
     )).forEach(s => {
       if (s.value?.page) {
 
         for (const p in s.value.page) {
-          rel[p] = rel[p] || 0;
-          rel[p] += s.value.page[p];
+          score[p] = score[p] || { rel: 0, wc: 0 };
+          score[p].rel += s.value.page[p];
+          score[p].wc++;
         }
 
       }
@@ -140,8 +141,8 @@ class StaticSearch {
 
     // convert to a list of objects
     const page = [];
-    for (const p in rel) {
-      page.push( { id: p, relevancy: rel[p] } );
+    for (const p in score) {
+      page.push( { id: p, relevancy: score[p].rel, found: score[p].wc / searchWordCount } );
     }
 
     page.sort((a, b) => b.relevancy - a.relevancy);
@@ -155,6 +156,7 @@ class StaticSearch {
 
       result[idx] = pData.value;
       result[idx].relevancy = page[idx].relevancy;
+      result[idx].found = page[idx].found;
 
     });
 

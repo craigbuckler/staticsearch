@@ -1,6 +1,6 @@
 {
   "name": "staticsearch",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Simple static site search system.",
   "type": "module",
   "main": "index.js",
@@ -52,7 +52,7 @@
     "perfpro": "0.2.0"
   },
   "devDependencies": {
-    "esbuild": "0.25.5",
+    "esbuild": "0.25.8",
     "pixdb": "1.0.2"
   }
 }
