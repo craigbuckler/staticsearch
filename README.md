@@ -4,7 +4,9 @@ StaticSearch is a simple search engine you can add to any static website. It use
 
 StaticSearch works with [Publican](https://publican.dev/) but can be used on any static site built by any generator. It currently works best on English language sites, but most Western languages can be used.
 
-**Full documentation is available at [publican.dev/staticsearch](https://publican.dev/staticsearch/)**
+**[Full documentation is available at publican.dev/staticsearch](https://publican.dev/staticsearch/)**
+
+[View the CHANGELOG for updates](https://github.com/craigbuckler/staticsearch/blob/main/CHANGELOG.md)
 
 To use StaticSearch, build your static site to a directory, then:
 

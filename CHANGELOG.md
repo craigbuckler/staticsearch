@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.0 - 2025-08-05](#050---2025-08-05)
+
+* new `found` value in search results with the proportion of words used in the page (0.0 to 1.0). A page including two of four search words has a `found` value of 0.5.
+* new `minfound` attribute (or `minFound` property) to limit results to a specific `found` value. Setting `minfound="1"` means a results page must contain all search words (logical AND).
+* stopword lists added for Danish (da), Dutch (nl), Finnish (fi), French (fr), German (de), Italian (it), Norwegian (no), Portuguese (pt), Spanish (es), Swedish (sv), and Turkish (tr), courtesy of [Stopwords ISO](https://github.com/stopwords-iso)
+
+
 ## [0.4.0 - 2025-06-25](#040---2025-06-25)
 
 * improved content indexing when no HTML `<main>` element is found
