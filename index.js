@@ -39,7 +39,7 @@ const
     { env: null,                    cli: 'helpenv',         clis: 'E',    prop: null,                     type: null,           default: null,                help: 'show .env/environment variable help' },
     { env: null,                    cli: 'helpapi',         clis: 'A',    prop: null,                     type: null,           default: null,                help: 'show Node.js API help' },
   ],
-  helpLink = styleText(['cyanBright'], 'For full help, refer to https://publican.dev/staticsearch/');
+  helpLink = styleText(['cyanBright'], 'For full help, refer to https://staticsearch.com/');
 
 // default options
 let opt = { help: true };

@@ -73,6 +73,7 @@ class StaticSearchWebComponent extends HTMLElement {
     else {
       this.#dialog.showModal();
       this.setAttribute('aria-expanded', 'true');
+      this.#search.select();
       this.#search.focus();
     }
 
@@ -105,7 +106,8 @@ class StaticSearchWebComponent extends HTMLElement {
       {
         minFound: this.getAttribute('minfound'),
         minScore: this.getAttribute('minscore'),
-        maxResults: this.getAttribute('maxresults')
+        maxResults: this.getAttribute('maxresults'),
+        highlight: this.hasAttribute('highlight')
       }
     );
 

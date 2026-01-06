@@ -2,9 +2,9 @@
 
 StaticSearch is a simple search engine you can add to any static website. It uses client-side JavaScript and JSON data files so there's no need for back-end server technologies or databases.
 
-StaticSearch works with [Publican](https://publican.dev/) but can be used on any static site built by any generator. It currently works best on English language sites, but most Western languages can be used.
+StaticSearch works with [Publican](https://publican.dev/) sites but you can use it on any static site built by any generator. It works best on English sites, but supports most Latin-based languages.
 
-**[Full documentation is available at publican.dev/staticsearch](https://publican.dev/staticsearch/)**
+**[Full documentation is available at staticsearch.com](https://staticsearch.com/)**
 
 [View the CHANGELOG for updates](https://github.com/craigbuckler/staticsearch/blob/main/CHANGELOG.md)
 
@@ -17,13 +17,13 @@ To use StaticSearch, build your static site to a directory, then:
 
 ## Index your site
 
-Assuming your static site is generated in a sub-directory named `./build/`, run the StaticSearch CLI command:
+Assuming you've generated your static site to a sub-directory named `./build/`, run the StaticSearch CLI command:
 
 ```bash
 npx staticsearch
 ```
 
-It creates a new directory named `./build/search/` containing JavaScript code and word index data.
+StaticSearch creates a new directory named `./build/search/` containing JavaScript code and word index data.
 
 If your site is in a different directory, such as `./dist/`, use:
 
@@ -52,7 +52,7 @@ npx staticsearch --helpapi
 
 ## Add search functionality to your site
 
-StaticSearch provides a [web component](https://publican.dev/tools/staticsearch/search-web-component/) to quickly add search facilities to your site. Add the following snippet to any template, perhaps in the HTML `<header>`:
+StaticSearch provides a [web component](https://publican.dev/tools/staticsearch/search-web-component/) to enable search facilities. Add the following snippet to your static site template, perhaps in the HTML `<header>`:
 
 ```html
 <script type="module" src="/search/staticsearch-component.js"></script>
@@ -62,12 +62,12 @@ StaticSearch provides a [web component](https://publican.dev/tools/staticsearch/
 </static-search>
 ```
 
-Any HTML element can be placed inside `<static-search>` to activate search when it's clicked. You can now rebuild the site to include this update and [re-run the indexer](#index-your-site).
+Use any HTML element inside `<static-search>` to activate search when it's clicked. You can now rebuild your site to include the update and [re-run the indexer](#index-your-site) to ensure word indexes are up-to-date.
 
 For full help, refer to:
 
-* [StaticSearch web component](https://publican.dev/tools/staticsearch/search-web-component/): provides full search functionality
+* [StaticSearch web component](https://staticsearch.com/search-web-component/): provides full search functionality
 
-* [StaticSearch bind module](https://publican.dev/tools/staticsearch/search-bind-module/): attach search functionality to HTML `<input>` and result elements
+* [StaticSearch bind module](https://staticsearch.com/search-bind-module/): attach search functionality to HTML `<input>` and result elements
 
-* [StaticSearch JavaScript search API](https://publican.dev/tools/staticsearch/search-api/): implement custom search functionality
+* [StaticSearch JavaScript search API](https://staticsearch.com/search-api/): create your own custom search functionality.

@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.6.0 - 2026-01-06](#060---2026-01-06)
+
+* results now sorted by relevancy, proportion of words found, then date (newest first)
+* can highlight terms in a page using [text fragments](https://developer.mozilla.org/docs/Web/URI/Reference/Fragment/Text_fragments)
+* search field text is now selected to permit overtyping
+* Documentation link now [staticsearch.com](https://staticsearch.com/)
+* added `DEVNOTES.md` development notes
+* [esbuild](https://esbuild.github.io/) update
+* stopword lists added for Afrikaans (af), Croatian (hr), Czech (cs), Estonian (et), Hungarian (hu), Irish (ga), Latvian (lv), Lithuanian (lt), Malay (ms), Polish (pl), Romanian (ro), Slovak (sk), Somali (so), Swahili (sw), and Zulu (zu) courtesy of [Stopwords ISO](https://github.com/stopwords-iso)
+
+
 ## [0.5.0 - 2025-08-05](#050---2025-08-05)
 
 * new `found` value in search results with the proportion of words used in the page (0.0 to 1.0). A page including two of four search words has a `found` value of 0.5.

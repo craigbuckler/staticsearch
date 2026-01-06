@@ -26,7 +26,8 @@ const
       {
         minFound: searchResult.getAttribute('minfound'),
         minScore: searchResult.getAttribute('minscore'),
-        maxResults: searchResult.getAttribute('maxresults')
+        maxResults: searchResult.getAttribute('maxresults'),
+        highlight: searchResult.hasAttribute('highlight')
       }
     );
 
@@ -127,6 +128,7 @@ export function staticSearchResult( element, opt = {} ) {
     minFound = parseFloat(opt.minFound) || 0,
     minScore = parseFloat(opt.minScore) || 0,
     maxResults = parseFloat(opt.maxResults) || 0,
+    highlight = !!opt.highlight,
     resultElement = opt.resultElement || 'ol';
 
   // create default message template
@@ -164,6 +166,11 @@ export function staticSearchResult( element, opt = {} ) {
     search = e.detail.search;
     const res = e.detail.result;
 
+    // highlight search terms
+    const highlightTerms = highlight ?
+      '#:~:' + search.split(/\W+/).reverse().map(s => 'text=' + encodeURIComponent( s.trim().toLowerCase() )).join('&')
+      : '';
+
     // clear results
     element.innerHTML = '';
 
@@ -177,7 +184,7 @@ export function staticSearchResult( element, opt = {} ) {
       if (item.found < minFound || (minScore && item.relevancy < minScore) || (maxResults && idx >= maxResults)) return;
 
       const template = itemTemplate.content.cloneNode(true);
-      updateNode(template, 'link', null, { href: item.url, id: `staticsearchresult-${ item.id }` });
+      updateNode(template, 'link', null, { href: item.url + highlightTerms, id: `staticsearchresult-${ item.id }` });
       updateNode(template, 'title', item.title);
       updateNode(template, 'description', item.description);
       if (item.date) updateNode(template, 'date', format.date( new Date(item.date) ), { datetime: item.date });
