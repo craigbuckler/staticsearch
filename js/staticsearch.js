@@ -145,9 +145,7 @@ class StaticSearch {
       page.push( { id: p, relevancy: score[p].rel, found: score[p].wc / searchWordCount } );
     }
 
-    page.sort((a, b) => b.relevancy - a.relevancy);
-
-    // sorted results array
+    // convert to page results array
     (await Promise.allSettled(
       page.map(p => this.#db.get({ store: 'page', key: parseFloat( p.id ) }) )
     )).forEach((pData, idx) => {
@@ -159,6 +157,13 @@ class StaticSearch {
       result[idx].found = page[idx].found;
 
     });
+
+    // sort by relevancy, words found, then date
+    result.sort((a, b) => (
+      (b.relevancy - a.relevancy) ||
+      (b.found - a.found) ||
+      (new Date(b.date || '0') - new Date(a.date || '0'))
+    ));
 
     // result event
     this.#triggerEvent('result', { search, result });
