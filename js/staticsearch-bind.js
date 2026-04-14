@@ -36,7 +36,12 @@ const
   if (searchInput && searchInput.tagName === 'INPUT') {
 
     // bind input
-    staticSearchInput( searchInput );
+    staticSearchInput(
+      searchInput,
+      {
+        fuzzy: searchInput.getAttribute('fuzzy')
+      }
+    );
 
   }
 
@@ -69,15 +74,19 @@ export function staticSearchSetQuery( search, hash ) {
 
   history.replaceState({}, '', url.href);
 
-};
+}
 
 
 // bind a search field to staticsearch
-export function staticSearchInput( field ) {
+export function staticSearchInput( field, opt = {} ) {
 
   // already attached?
   if (field[attached]) return;
   field[attached] = true;
+
+  // fuzzy search value
+  let fuzzy = parseFloat(opt.fuzzy);
+  if (isNaN(fuzzy) || fuzzy < 0) fuzzy = 6;
 
   // querystring
   if (field.name) queryString = field.name;
@@ -104,7 +113,7 @@ export function staticSearchInput( field ) {
     sessionStorage.setItem(appName, search);
     if (search.length < 2) return;
 
-    staticsearch.find( search )
+    staticsearch.find( search, fuzzy )
       .then( result => {
         console.log('SEARCH:', search);
         console.log('RESULT:', result);

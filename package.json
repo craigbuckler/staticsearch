@@ -1,6 +1,6 @@
 {
   "name": "staticsearch",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Simple static site search system.",
   "type": "module",
   "main": "index.js",
@@ -48,11 +48,11 @@
   },
   "dependencies": {
     "concol": "2.1.1",
-    "node-html-parser": "7.0.1",
+    "node-html-parser": "7.1.0",
     "perfpro": "0.2.0"
   },
   "devDependencies": {
-    "esbuild": "0.27.2",
+    "esbuild": "0.28.0",
     "pixdb": "1.0.2"
   }
 }

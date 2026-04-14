@@ -4,8 +4,8 @@ dialog {
   font-size: var(--fsize);
   inline-size: var(--dmax);
   block-size: 100%;
-  max-inline-size: calc(100dvw - (2 * var(--dmargin)));
-  max-block-size: calc(100dvh - (2 * var(--dmargin)));
+  max-inline-size: calc(100dvi - (2 * var(--dmargin)));
+  max-block-size: calc(100dvb - (2 * var(--dmargin)));
   margin: auto;
   padding: 0;
   color: var(--colfore0);

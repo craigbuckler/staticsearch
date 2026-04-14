@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.7.0 - 2026-04-14]
+
+* tries to find build directory at ./build, ./dist, ./dest, ./out, ./target, then ./
+* new `ignorestopdefault` option omits default stop words for language
+* `<static-search>` component is keyboard focusable
+* any element with a `data-static-search="search"` attribute triggers the `<static-search>` dialog
+* new partial word search and `fuzzy` configuration attribute
+* result scrollbars styled to use `--staticsearch-color-fore2`
+* bug fix: `search` directory added to build directory unless set
+* bug fix: Windows slug path slashes now use / rather than \
+* [esbuild](https://esbuild.github.io/) update
+* removed some English stop words with valid meanings in technical documents
+* minor refactoring, bug fixes, and documentation updates
+
+
 ## [0.6.0 - 2026-01-06](#060---2026-01-06)
 
 * results now sorted by relevancy, proportion of words found, then date (newest first)
