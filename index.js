@@ -8,37 +8,40 @@ import { staticsearch } from './indexer.js';
 
 const
   // option configuration
+  /* eslint-disable no-multi-spaces */
   config = [
-    { env: null,                    cli: 'env',             clis: 'e',    prop: null,                     type: 'file',         default: null,                help: 'load defaults from an .env file' },
-    { env: 'BUILD_DIR',             cli: 'builddir',        clis: 'b',    prop: 'buildDir',               type: 'path',         default: './build/',          help: 'directory containing static files' },
-    { env: 'SEARCH_DIR',            cli: 'searchdir',       clis: 's',    prop: 'searchDir',              type: 'path',         default: './build/search/',   help: 'index file directory' },
-    { env: 'SITE_DOMAIN',           cli: 'domain',          clis: 'd',    prop: 'siteDomain',             type: 'domain',       default: 'http://localhost',  help: 'site domain if links use full URL' },
-    { env: 'BUILD_ROOT',            cli: 'root',            clis: 'r',    prop: 'buildRoot',              type: 'path',         default: '/',                 help: 'site root path' },
-    { env: 'SITE_INDEXFILE',        cli: 'indexfile',       clis: 'i',    prop: 'siteIndexFile',          type: 'name',         default: 'index.html',        help: 'default index file' },
-    { env: 'SITE_PARSEROBOTSFILE',  cli: 'ignorerobotfile', clis: 'f',    prop: 'siteParseRobotsFile',    type: 'true|false',   default: true,                help: 'parse robot.txt Disallows' },
-    { env: 'SITE_PARSEROBOTSMETA',  cli: 'ignorerobotmeta', clis: 'm',    prop: 'siteParseRobotsMeta',    type: 'true|false',   default: true,                help: 'parse robot meta noindex' },
-    { env: 'PAGE_DOMSELECTORS',     cli: 'dom',             clis: 'D',    prop: 'pageDOMSelectors',       type: 'str',          default: '',                  help: 'CSS selector: nodes to include' },
-    { env: 'PAGE_DOMEXCLUDE',       cli: 'domx',            clis: 'X',    prop: 'pageDOMExclude',         type: 'str',          default: '',                  help: 'CSS selector: nodes to exclude' },
-    { env: 'LANGUAGE',              cli: 'language',        clis: 'l',    prop: 'language',               type: 'str',          default: 'en',                help: 'language' },
-    { env: 'WORDCROP',              cli: 'wordcrop',        clis: 'c',    prop: 'wordCrop',               type: 'num',          default: 7,                   help: 'crop word letters' },
-    { env: 'STOPWORDS',             cli: 'stopwords',       clis: 'S',    prop: 'stopWords',              type: 'str',          default: null,                help: 'comma-separated list of stop words' },
-    { env: 'WEIGHT_LINK',           cli: 'weightlink',      clis: '',     prop: 'wordWeight.link',        type: 'num',          default: 5,                   help: 'word weight for inbound links' },
-    { env: 'WEIGHT_TITLE',          cli: 'weighttitle',     clis: '',     prop: 'wordWeight.title',       type: 'num',          default: 10,                  help: 'word weight for main title' },
-    { env: 'WEIGHT_DESCRIPTION',    cli: 'weightdesc',      clis: '',     prop: 'wordWeight.description', type: 'num',          default: 8,                   help: 'word weight for description' },
-    { env: 'WEIGHT_H2',             cli: 'weighth2',        clis: '',     prop: 'wordWeight.h2',          type: 'num',          default: 6,                   help: 'word weight for H2 headings' },
-    { env: 'WEIGHT_H3',             cli: 'weighth3',        clis: '',     prop: 'wordWeight.h3',          type: 'num',          default: 5,                   help: 'word weight for H3 headings' },
-    { env: 'WEIGHT_H4',             cli: 'weighth4',        clis: '',     prop: 'wordWeight.h4',          type: 'num',          default: 4,                   help: 'word weight for H4 headings' },
-    { env: 'WEIGHT_H5',             cli: 'weighth5',        clis: '',     prop: 'wordWeight.h5',          type: 'num',          default: 3,                   help: 'word weight for H5 headings' },
-    { env: 'WEIGHT_H6',             cli: 'weighth6',        clis: '',     prop: 'wordWeight.h6',          type: 'num',          default: 2,                   help: 'word weight for H6 headings' },
-    { env: 'WEIGHT_EMPHASIS',       cli: 'weightemphasis',  clis: '',     prop: 'wordWeight.emphasis',    type: 'num',          default: 2,                   help: 'word weight for bold and italic' },
-    { env: 'WEIGHT_ALT',            cli: 'weightalt',       clis: '',     prop: 'wordWeight.alt',         type: 'num',          default: 1,                   help: 'word weight for alt tags' },
-    { env: 'WEIGHT_CONTENT',        cli: 'weightcontent',   clis: '',     prop: 'wordWeight.content',     type: 'num',          default: 1,                   help: 'word weight for content' },
-    { env: 'LOGLEVEL',              cli: 'loglevel',        clis: 'L',    prop: 'logLevel',               type: 'num',          default: 2,                   help: 'logging verbosity' },
-    { env: null,                    cli: 'version',         clis: 'v',    prop: null,                     type: null,           default: null,                help: 'show application version' },
-    { env: null,                    cli: 'help',            clis: '?',    prop: null,                     type: null,           default: null,                help: 'show help' },
-    { env: null,                    cli: 'helpenv',         clis: 'E',    prop: null,                     type: null,           default: null,                help: 'show .env/environment variable help' },
-    { env: null,                    cli: 'helpapi',         clis: 'A',    prop: null,                     type: null,           default: null,                help: 'show Node.js API help' },
+    { env: null,                    cli: 'env',               clis: 'e',    prop: null,                     type: 'file',         default: null,                help: 'load defaults from an .env file' },
+    { env: 'BUILD_DIR',             cli: 'builddir',          clis: 'b',    prop: 'buildDir',               type: 'path',         default: './build/',          help: 'directory containing static files' },
+    { env: 'SEARCH_DIR',            cli: 'searchdir',         clis: 's',    prop: 'searchDir',              type: 'path',         default: './build/search/',   help: 'index file directory' },
+    { env: 'SITE_DOMAIN',           cli: 'domain',            clis: 'd',    prop: 'siteDomain',             type: 'domain',       default: 'http://localhost',  help: 'site domain if links use full URL' },
+    { env: 'BUILD_ROOT',            cli: 'root',              clis: 'r',    prop: 'buildRoot',              type: 'path',         default: '/',                 help: 'site root path' },
+    { env: 'SITE_INDEXFILE',        cli: 'indexfile',         clis: 'i',    prop: 'siteIndexFile',          type: 'name',         default: 'index.html',        help: 'default index file' },
+    { env: 'SITE_PARSEROBOTSFILE',  cli: 'ignorerobotfile',   clis: 'f',    prop: 'siteParseRobotsFile',    type: 'true|false',   default: true,                help: 'parse robot.txt Disallows' },
+    { env: 'SITE_PARSEROBOTSMETA',  cli: 'ignorerobotmeta',   clis: 'm',    prop: 'siteParseRobotsMeta',    type: 'true|false',   default: true,                help: 'parse robot meta noindex' },
+    { env: 'PAGE_DOMSELECTORS',     cli: 'dom',               clis: 'D',    prop: 'pageDOMSelectors',       type: 'str',          default: '',                  help: 'CSS selector: nodes to include' },
+    { env: 'PAGE_DOMEXCLUDE',       cli: 'domx',              clis: 'X',    prop: 'pageDOMExclude',         type: 'str',          default: '',                  help: 'CSS selector: nodes to exclude' },
+    { env: 'LANGUAGE',              cli: 'language',          clis: 'l',    prop: 'language',               type: 'str',          default: 'en',                help: 'language' },
+    { env: 'WORDCROP',              cli: 'wordcrop',          clis: 'c',    prop: 'wordCrop',               type: 'num',          default: 7,                   help: 'crop word letters' },
+    { env: 'STOPWORDS',             cli: 'stopwords',         clis: 'S',    prop: 'stopWords',              type: 'str',          default: null,                help: 'comma-separated list of stop words' },
+    { env: 'STOPWORDS_DEFAULT',     cli: 'ignorestopdefault', clis: 'W',    prop: 'stopWordsDefault',       type: 'true|false',   default: true,                help: 'use language default stop words' },
+    { env: 'WEIGHT_LINK',           cli: 'weightlink',        clis: '',     prop: 'wordWeight.link',        type: 'num',          default: 5,                   help: 'word weight for inbound links' },
+    { env: 'WEIGHT_TITLE',          cli: 'weighttitle',       clis: '',     prop: 'wordWeight.title',       type: 'num',          default: 10,                  help: 'word weight for main title' },
+    { env: 'WEIGHT_DESCRIPTION',    cli: 'weightdesc',        clis: '',     prop: 'wordWeight.description', type: 'num',          default: 8,                   help: 'word weight for description' },
+    { env: 'WEIGHT_H2',             cli: 'weighth2',          clis: '',     prop: 'wordWeight.h2',          type: 'num',          default: 6,                   help: 'word weight for H2 headings' },
+    { env: 'WEIGHT_H3',             cli: 'weighth3',          clis: '',     prop: 'wordWeight.h3',          type: 'num',          default: 5,                   help: 'word weight for H3 headings' },
+    { env: 'WEIGHT_H4',             cli: 'weighth4',          clis: '',     prop: 'wordWeight.h4',          type: 'num',          default: 4,                   help: 'word weight for H4 headings' },
+    { env: 'WEIGHT_H5',             cli: 'weighth5',          clis: '',     prop: 'wordWeight.h5',          type: 'num',          default: 3,                   help: 'word weight for H5 headings' },
+    { env: 'WEIGHT_H6',             cli: 'weighth6',          clis: '',     prop: 'wordWeight.h6',          type: 'num',          default: 2,                   help: 'word weight for H6 headings' },
+    { env: 'WEIGHT_EMPHASIS',       cli: 'weightemphasis',    clis: '',     prop: 'wordWeight.emphasis',    type: 'num',          default: 2,                   help: 'word weight for bold and italic' },
+    { env: 'WEIGHT_ALT',            cli: 'weightalt',         clis: '',     prop: 'wordWeight.alt',         type: 'num',          default: 1,                   help: 'word weight for alt tags' },
+    { env: 'WEIGHT_CONTENT',        cli: 'weightcontent',     clis: '',     prop: 'wordWeight.content',     type: 'num',          default: 1,                   help: 'word weight for content' },
+    { env: 'LOGLEVEL',              cli: 'loglevel',          clis: 'L',    prop: 'logLevel',               type: 'num',          default: 2,                   help: 'logging verbosity' },
+    { env: null,                    cli: 'version',           clis: 'v',    prop: null,                     type: null,           default: null,                help: 'show application version' },
+    { env: null,                    cli: 'help',              clis: '?',    prop: null,                     type: null,           default: null,                help: 'show help' },
+    { env: null,                    cli: 'helpenv',           clis: 'E',    prop: null,                     type: null,           default: null,                help: 'show .env/environment variable help' },
+    { env: null,                    cli: 'helpapi',           clis: 'A',    prop: null,                     type: null,           default: null,                help: 'show Node.js API help' },
   ],
+  /* eslint-enable no-multi-spaces */
   helpLink = styleText(['cyanBright'], 'For full help, refer to https://staticsearch.com/');
 
 // default options
@@ -101,7 +104,7 @@ Options:
 ${
   config
     .filter(c => c.cli)
-    .map(c => `  ${ (c.clis ? `-${ c.clis }, ` : '    ') }--${ c.cli.padEnd(15) }${ styleText(['dim'], (c.type && c.type !== 'true|false' ? ' <' + c.type + '>' : '').padEnd(13)) } ${ c.help } ${ c.default ? styleText(['dim'], `(${ c.default })`) : '' }`)
+    .map(c => `  ${ (c.clis ? `-${ c.clis }, ` : '    ') }--${ c.cli.padEnd(18) }${ styleText(['dim'], (c.type && c.type !== 'true|false' ? ' <' + c.type + '>' : '').padEnd(10)) } ${ c.help } ${ c.default !== null && c.default !== '' ? styleText(['dim'], `(${ String( c.default ) })`) : '' }`)
     .join('\n')
 }
 
@@ -113,6 +116,9 @@ Examples:
 The first non-dashed parameter is presumed to be the build directory:
 
   staticsearch ./dest/ --searchdir ./dest/search/
+
+When --builddir is not set, the indexer attempts to find static files in:
+./build/, ./dist/, ./dest/, ./out/, ./target/, or the current directory.
 
 `);
 }
@@ -131,13 +137,13 @@ Variables:
 
 ${ config
     .filter(c => c.env)
-    .map(c => `  ${ c.env }${ styleText(['dim'], (c.type ? '=<' + c.type + '>' : '').padEnd(33 - c.env.length)) } ${ c.help } ${ c.default ? styleText(['dim'], `(${ c.default })`) : '' }`)
+    .map(c => `  ${ c.env }${ styleText(['dim'], (c.type ? '=<' + c.type + '>' : '').padEnd(34 - c.env.length)) } ${ c.help } ${ c.default ? styleText(['dim'], `(${ c.default })`) : '' }`)
     .join('\n')
 }
 ${ styleText(['green'], `
 # Example .env file
 BUILD_DIR=./dest/
-SEARCH_DIR=./dest/index/
+SEARCH_DIR=./dest/searchindex/
 BUILD_ROOT=/blog/
 `) }
 Load using:
@@ -157,7 +163,7 @@ if (opt.helpapi) {
   console.log(`
 ${ styleText(['yellowBright'], 'StaticSearch Node.js API help') }
 
-You can use the Node.js API to programmatically index a static site.
+Use the Node.js API to programmatically index a static site.
 
 Install the module into a Node.js project:
 
@@ -170,7 +176,7 @@ ${ styleText(['green'], `
 
   // configuration
   staticsearch.buildDir = './dest/';
-  staticsearch.searchDir = './dest/index/';
+  staticsearch.searchDir = './dest/searchindex/';
   staticsearch.buildRoot = './blog/';
   staticsearch.wordWeight.title = 20;
 
@@ -185,7 +191,7 @@ staticsearch object configuration properties:
 
 ${ config
     .filter(c => c.prop)
-    .map(c => `  ${ styleText(['green'], '.' + c.prop) }${ styleText(['dim'], (c.type ? ' = <' + c.type + '>;' : '').padEnd(35 - c.prop.length)) } ${ c.help } ${ c.default ? styleText(['dim'], `(${ c.type != 'num' && c.type != 'true|false' ? '\'' : ''}${ c.default }${ c.type != 'num' && c.type != 'true|false' ? '\'' : ''})`) : '' }`)
+    .map(c => `  ${ styleText(['green'], '.' + c.prop) }${ styleText(['dim'], (c.type ? ' = <' + c.type + '>;' : '').padEnd(36 - c.prop.length)) } ${ c.help } ${ c.default ? styleText(['dim'], `(${ c.type != 'num' && c.type != 'true|false' ? '\'' : ''}${ c.default }${ c.type != 'num' && c.type != 'true|false' ? '\'' : ''})`) : '' }`)
     .join('\n')
 }
 
@@ -208,7 +214,6 @@ if (opt.env) {
   process.loadEnvFile(opt.env);
 }
 
-
 // set defaults
 config.forEach(c => {
 
@@ -220,23 +225,24 @@ config.forEach(c => {
 
     switch (c.type) {
 
-      case 'int':
-      case 'num':
-        value = parseFloat(value);
-        break;
+    case 'int':
+    case 'num':
+      value = parseFloat(value);
+      break;
 
-      case 'str':
-        value = value.trim();
-        break;
+    case 'str':
+      value = value.trim();
+      break;
 
-      case 'true|false':
-        if (c.cli.startsWith('ignore')) value = !value;
-        break;
+    case 'true|false':
+      value = String(value).trim().toLowerCase() !== 'false';
+      if (opt[c.cli] && c.cli.startsWith('ignore')) value = !value;
+      break;
 
     }
 
     // set property
-    const [p1,p2] = c.prop.split('.');
+    const [p1, p2] = c.prop.split('.');
 
     if (p2) {
       staticsearch[ p1 ][ p2 ] = value;

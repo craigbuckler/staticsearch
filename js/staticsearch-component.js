@@ -28,10 +28,13 @@ class StaticSearchWebComponent extends HTMLElement {
     const searchLink = this.firstElementChild;
 
     // attach shadow DOM
-    this.attachShadow({ mode: 'open' });
+    this.tabIndex = 0;
+    this.attachShadow({ mode: 'open', delegatesFocus: true });
 
     if (!searchLink) return;
-    searchLink.setAttribute('part', 'startsearch');
+    if (!searchLink.getAttribute('part')) {
+      searchLink.setAttribute('part', 'activate');
+    }
 
     // load styles
     const link = document.createElement('link');
@@ -46,15 +49,25 @@ class StaticSearchWebComponent extends HTMLElement {
     this.#createDialog();
 
     // search click
+    opener.tabIndex = 0;
     opener.style.cursor = 'pointer';
-    opener.addEventListener('click', e => { e.preventDefault(); this.#toggleDialog(); });
+    opener.addEventListener('click', e => this.#toggleDialog(e) );
+    opener.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        this.#toggleDialog(e);
+      }
+    });
 
     // Ctrl+K click
     window.addEventListener('keydown', e => {
       if (e.key === 'k' && (e.ctrlKey || e.metaKey)) {
-        e.preventDefault();
-        this.#toggleDialog();
+        this.#toggleDialog(e);
       }
+    });
+
+    // static search click
+    window.addEventListener('click', e => {
+      if (!this.#dialog.open && e.target.dataset.staticSearch) this.#toggleDialog(e);
     });
 
     // query string set?
@@ -65,7 +78,9 @@ class StaticSearchWebComponent extends HTMLElement {
   }
 
   // show/hide search dialog
-  #toggleDialog() {
+  #toggleDialog(e) {
+
+    if (e) e.preventDefault();
 
     if (this.#dialog.open) {
       this.#closeDialog();
@@ -112,7 +127,12 @@ class StaticSearchWebComponent extends HTMLElement {
     );
 
     // bind search input
-    staticSearchInput( this.#search );
+    staticSearchInput(
+      this.#search,
+      {
+        fuzzy: this.getAttribute('fuzzy')
+      }
+    );
 
     // dialog close event
     this.#dialog.addEventListener('close', () => this.#closeDialog());

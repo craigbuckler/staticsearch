@@ -1,0 +1,9 @@
+/* search activation element */
+[part="activate"] {
+  color: var(--colfore2);
+  outline: none;
+
+  &:hover, &:active, &:focus {
+    color: var(--collinkd);
+  }
+}

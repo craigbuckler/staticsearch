@@ -1,5 +1,6 @@
 /* staticsearch-component styles */
 @import url('./partials/variables.css');
+@import url('./partials/activate.css');
 @import url('./partials/dialog.css');
 @import url('./partials/searchform.css');
 @import url('./partials/searchresults.css');

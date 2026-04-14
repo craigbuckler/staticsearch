@@ -1,17 +1,21 @@
+/* search results list */
 [part="results"] {
   position: absolute;
   inset-inline: 0;
   inset-block: 0;
   inset-block-start: var(--sheight);
   padding: var(--dpadding);
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: hidden auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--colfore2) transparent;
+  overscroll-behavior-block: contain;
+  outline: none;
 
   &::after {
     position: fixed;
     content: '';
-    block-size: 5vh;
-    inset-inline: 0;
+    block-size: 5vb;
+    inset-inline: var(--dpadding);
     inset-block-end: 0;
     background: linear-gradient(transparent, var(--colback0));
     pointer-events: none;

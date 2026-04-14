@@ -6,8 +6,9 @@ import crypto from 'node:crypto';
 import { PerfPro } from 'perfpro';
 import { ConCol } from 'concol';
 
+import { env } from './lib/util.js';
 import { parseRobotsTxt, parseHTML } from './lib/parser.js';
-import { writePath, deletePath } from './lib/file.js';
+import { findReadableDir, writePath, deletePath } from './lib/file.js';
 import { stemFilename, stemFunction, stopWords } from './lib/lang.js';
 
 // performance handler
@@ -26,47 +27,58 @@ class StaticSearch {
   #wordIndexChars = 2;
   #JSONspacing = '';
 
-  language = process.env.LOCALE;
-  wordCrop = process.env.WORDCROP;
-  stopWords = process.env.STOPWORDS;
-  buildDir = process.env.BUILD_DIR || './build/';
-  searchDir = process.env.SEARCH_DIR || join(this.buildDir, 'search/');
-  buildRoot = process.env.BUILD_ROOT || '/';
-  siteDomain = process.env.SITE_DOMAIN || 'http://localhost';
-  siteIndexFile = process.env.SITE_INDEXFILE || 'index.html';
+  buildDir = env('BUILD_DIR');
+  searchDir = env('SEARCH_DIR');
+  buildRoot = env('BUILD_ROOT', '/');
+  siteDomain = env('SITE_DOMAIN', 'http://localhost');
+  siteIndexFile = env('SITE_INDEXFILE', 'index.html');
 
-  siteParseRobotsFile = (process.env.SITE_PARSEROBOTSFILE?.toLowerCase() !== 'false');
-  siteParseRobotsMeta = (process.env.SITE_PARSEROBOTSMETA?.toLowerCase() !== 'false');
+  siteParseRobotsFile = (env('SITE_PARSEROBOTSFILE', 'true').toLowerCase() !== 'false');
+  siteParseRobotsMeta = (env('SITE_PARSEROBOTSMETA', 'true').toLowerCase() !== 'false');
 
-  pageDOMSelectors = (process.env.PAGE_DOMSELECTORS || '');
-  pageDOMExclude = (process.env.PAGE_DOMEXCLUDE || '');
+  pageDOMSelectors = env('PAGE_DOMSELECTORS', '');
+  pageDOMExclude = env('PAGE_DOMEXCLUDE', '');
+
+  language = env('LOCALE');
+  wordCrop = env('WORDCROP');
+  stopWords = env('STOPWORDS');
+  stopWordsDefault = (env('STOPWORDS_DEFAULT', 'true').toLowerCase() !== 'false');
 
   wordWeight = {
-    title:        parseFloat(process.env.WEIGHT_TITLE  || 10),
-    description:  parseFloat(process.env.WEIGHT_DESCRIPTION || 8),
-    h2:           parseFloat(process.env.WEIGHT_H2 || 6),
-    h3:           parseFloat(process.env.WEIGHT_H3 || 5),
-    h4:           parseFloat(process.env.WEIGHT_H4 || 4),
-    h5:           parseFloat(process.env.WEIGHT_H5 || 3),
-    h6:           parseFloat(process.env.WEIGHT_H6 || 2),
-    content:      parseFloat(process.env.WEIGHT_CONTENT || 1),
-    emphasis:     parseFloat(process.env.WEIGHT_EMPHASIS || 2),
-    alt:          parseFloat(process.env.WEIGHT_ALT || 1),
-    link:         parseFloat(process.env.WEIGHT_LINK || 5)
+    title:        env('WEIGHT_TITLE', 10),
+    description:  env('WEIGHT_DESCRIPTION', 8),
+    h2:           env('WEIGHT_H2', 6),
+    h3:           env('WEIGHT_H3', 5),
+    h4:           env('WEIGHT_H4', 4),
+    h5:           env('WEIGHT_H5', 3),
+    h6:           env('WEIGHT_H6', 2),
+    content:      env('WEIGHT_CONTENT', 1),
+    emphasis:     env('WEIGHT_EMPHASIS', 2),
+    alt:          env('WEIGHT_ALT', 1),
+    link:         env('WEIGHT_LINK', 5)
   };
 
-  logLevel = process.env.LOGLEVEL || 2;
+  logLevel = env('LOGLEVEL', 2);
 
   // start indexing
   async index() {
 
-    // resolved working directories
+    // concol defaults
+    concol = new ConCol('StaticSearch', 'magentaBright', parseFloat(this.logLevel) || 0);
+
+    // find readable build directory
+    const workingBuildDir = await findReadableDir(process.cwd(), this.buildDir || './build,./dist,./dest,./out,./target,./');
+
+    if (!workingBuildDir) {
+      concol.error('no static site build directory found');
+      return;
+    }
+
+    // set working directories
     const
-      workingBuildDir = resolve(process.cwd(), this.buildDir),
-      workingSearchDir = resolve(process.cwd(), this.searchDir),
+      workingSearchDir = this.searchDir ? resolve(process.cwd(), this.searchDir) : resolve(workingBuildDir, './search'),
       workingStaticSite = resolve( '/', dirname( import.meta.url.replace(/^[^/]*\/+/, '') ) );
 
-    concol = new ConCol('StaticSearch', 'magentaBright', parseFloat(this.logLevel) || 0);
     concol.log(['StaticSearch indexing started', '', ['processing HTML files in', workingBuildDir], ['writing index data to', workingSearchDir], '' ], 1);
 
     // set language, stem and stopword
@@ -75,7 +87,7 @@ class StaticSearch {
 
     const
       stem = await stemFunction(this.language),
-      stopword = await stopWords(this.language, this.wordCrop, this.stopWords);
+      stopword = await stopWords(this.language, this.stopWordsDefault, this.stopWords, this.wordCrop);
 
     // parse robots.txt
     const robotsIgnore = await parseRobotsTxt(
@@ -110,7 +122,7 @@ class StaticSearch {
           slug = dirname(slug);
           if (!slug.endsWith(sep)) slug += sep;
         }
-        slug = slug.replace(sep, '/');
+        slug = slug.replaceAll(sep, '/');
 
         return { file, slug };
 

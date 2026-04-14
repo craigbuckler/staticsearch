@@ -29,12 +29,12 @@ class StaticSearch {
 
       switch (oldVersion) {
 
-        case 0: {
-          init.createObjectStore('cfg', { keyPath: 'name' });     // configuration
-          init.createObjectStore('page', { keyPath: 'id' });      // page index
-          init.createObjectStore('file', { keyPath: 'id' });      // word files
-          init.createObjectStore('index', { keyPath: 'word' });   // word index
-        }
+      case 0: {
+        init.createObjectStore('cfg', { keyPath: 'name' });     // configuration
+        init.createObjectStore('page', { keyPath: 'id' });      // page index
+        init.createObjectStore('file', { keyPath: 'id' });      // word files
+        init.createObjectStore('index', { keyPath: 'word' });   // word index
+      }
 
       }
 
@@ -55,7 +55,7 @@ class StaticSearch {
 
       this.#ready = true;
       return true;
-    };
+    }
 
     // clear stores
     await Promise.allSettled([
@@ -98,7 +98,7 @@ class StaticSearch {
 
 
   // search for words in string
-  async find( search ) {
+  async find( search, fuzzy = 6 ) {
 
     if (!this.#ready) {
       throw new Error('StaticSearch failed to initialize');
@@ -121,28 +121,56 @@ class StaticSearch {
       searchWords.map( w => this.loadIndex(w) )
     );
 
-    console.log('[search] GETTING SCORES');
-
     // get page scores and calculate relevancy
+    console.log(`[search] GETTING SCORES (fuzzy: ${ fuzzy })`);
+
     const score = {};
     (await Promise.allSettled(
-      searchWords.map( key => this.#db.get({ store: 'index', key }) )
-    )).forEach(s => {
-      if (s.value?.page) {
 
-        for (const p in s.value.page) {
-          score[p] = score[p] || { rel: 0, wc: 0 };
-          score[p].rel += s.value.page[p];
-          score[p].wc++;
+      fuzzy > 1 ?
+
+        // fuzzy search - gets partial words
+        searchWords.map(
+          key => this.#db.getAll({ store: 'index', lowerBound: key, count: fuzzy })
+            .then(r => r.filter(w => w.word.startsWith(key)))
+            .then(r => r.map(w => { w.key = key; return w; } ))
+        ) :
+
+        // exact word search
+        searchWords.map(
+          key => this.#db.get({ store: 'index', key })
+            .then(r => {
+              if (r) {
+                r.key = key;
+                return [ r ];
+              }
+              else return [];
+            })
+        )
+
+    )).forEach(s => {
+
+      s.value?.forEach(r => {
+
+        if (r.page) {
+
+          // relevancy score for each page found for each term
+          for (const p in r.page) {
+            score[p] = score[p] || { rel: 0, wc: new Set() };
+            score[p].rel += r.page[p];
+            score[p].wc.add(r.key);
+          }
+
         }
 
-      }
+      });
+
     });
 
     // convert to a list of objects
     const page = [];
     for (const p in score) {
-      page.push( { id: p, relevancy: score[p].rel, found: score[p].wc / searchWordCount } );
+      page.push( { id: p, relevancy: score[p].rel, found: score[p].wc.size / searchWordCount } );
     }
 
     // convert to page results array

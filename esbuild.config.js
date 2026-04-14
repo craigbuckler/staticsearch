@@ -1,10 +1,10 @@
-import process from 'node:process';
 import esbuild from 'esbuild';
 
+import { env } from './lib/util.js';
 import { deletePath } from './lib/file.js';
 
 const
-  isDev = (process.env.NODE_ENV === 'development'),
+  isDev = (env('NODE_ENV') === 'development'),
   target = 'chrome136,firefox136,safari17.2'.split(','),
   logLevel = isDev ? 'info' : 'error',
   minify = !isDev,
