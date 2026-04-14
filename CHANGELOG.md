@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.7.0 - 2026-04-14]
+## [0.7.0 - 2026-04-14](#070---2026-04-14)
 
 * tries to find build directory at ./build, ./dist, ./dest, ./out, ./target, then ./
 * new `ignorestopdefault` option omits default stop words for language
