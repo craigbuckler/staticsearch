@@ -1,6 +1,6 @@
 {
   "name": "staticsearch",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Simple static site search system.",
   "type": "module",
   "main": "index.js",

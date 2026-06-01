@@ -5,7 +5,7 @@ let queryString = 'q', queryCount = 0;
 const
   appName = '__AGENT__',
   attached = Symbol(appName),
-  inputDebounce = 500,
+  inputDebounce = 300,
   format = {
     date: new Intl.DateTimeFormat([], { dateStyle: 'long' }).format,
     number: new Intl.NumberFormat([], { maximumFractionDigits: 0 }).format

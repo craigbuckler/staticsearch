@@ -58,11 +58,17 @@ class StaticSearchWebComponent extends HTMLElement {
       }
     });
 
-    // Ctrl+K click
+    // Ctrl+K or Esc click
     window.addEventListener('keydown', e => {
+
       if (e.key === 'k' && (e.ctrlKey || e.metaKey)) {
         this.#toggleDialog(e);
       }
+
+      if (e.key === 'Escape' && this.#dialog.open && !this.#search.value) {
+        this.#closeDialog();
+      }
+
     });
 
     // static search click
@@ -108,7 +114,7 @@ class StaticSearchWebComponent extends HTMLElement {
     dialog.setAttribute('closedby', 'any');
     dialog.setAttribute('part', 'dialog');
 
-    dialog.innerHTML = `<form method="dialog"><button part="close"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path xmlns="http://www.w3.org/2000/svg" fill="currentColor" d="M5.3 5.3a1 1 0 0 1 1.4 0l5.3 5.3 5.3-5.3a1 1 0 1 1 1.4 1.4L13.4 12l5.3 5.3a1 1 0 0 1-1.4 1.4L12 13.4l-5.3 5.3a1 1 0 0 1-1.4-1.4l5.3-5.3-5.3-5.3a1 1 0 0 1 0-1.4Z"/></svg></button></form><search part="search"><label for="search" part="searchlabel">${ this.getAttribute('label') || 'search' }</label><input type="search" id="search" name="q" minlength="2" maxlength="300" part="searchinput" /></search><div part="results"></div>`;
+    dialog.innerHTML = `<form method="dialog"><button part="close"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path xmlns="http://www.w3.org/2000/svg" fill="currentColor" d="M5.3 5.3a1 1 0 0 1 1.4 0l5.3 5.3 5.3-5.3a1 1 0 1 1 1.4 1.4L13.4 12l5.3 5.3a1 1 0 0 1-1.4 1.4L12 13.4l-5.3 5.3a1 1 0 0 1-1.4-1.4l5.3-5.3-5.3-5.3a1 1 0 0 1 0-1.4Z"/></svg></button></form><search part="search"><label for="search" part="searchlabel">${ this.getAttribute('label') || 'search' }</label><input type="search" id="search" name="q" minlength="2" maxlength="300" part="searchinput" /></search><div part="results"></div><a part="poweredby" href="https://staticsearch.com/">powered by StaticSearch</a>`;
 
     // get elements
     this.#dialog = this.shadowRoot.appendChild(dialog);

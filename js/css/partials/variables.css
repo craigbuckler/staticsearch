@@ -2,7 +2,7 @@
 :host {
 
   /* font sizes */
-  --fsize: var(--staticsearch-fontsize, 1em);
+  --fsize: var(--staticsearch-fontsize, max(16px, 1em));
 
   /* dimensions */
   --dmax: var(--staticsearch-maxwidth, 60ch);

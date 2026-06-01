@@ -1,0 +1,18 @@
+/* powered by message */
+[part="poweredby"] {
+  position: absolute;
+  inset-inline: var(--dpadding);
+  inset-block-start: auto;
+  inset-block-end: 0;
+  font-size: 0.6em;
+  text-align: end;
+  padding: 0.5em 0;
+
+  &:link, &:visited {
+    color: var(--colfore2);
+  }
+
+  &:hover, &:active, &:focus {
+    color: var(--colfore0);
+  }
+}

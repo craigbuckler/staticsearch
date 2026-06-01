@@ -2,7 +2,7 @@
 
 StaticSearch is a simple search engine you can add to any static website. It uses client-side JavaScript and JSON data files so there's no need for back-end server technologies or databases.
 
-StaticSearch works with [Publican](https://publican.dev/) sites but you can use it on any static site built by any generator. It works best on English sites, but supports most Latin-based languages.
+StaticSearch works with [Publican](https://publican.dev/) sites but you can use it with any static site generator that outputs HTML pages. It works best on English sites, but supports most Latin-based languages.
 
 **[Full documentation is available at staticsearch.com](https://staticsearch.com/)**
 
@@ -52,22 +52,22 @@ npx staticsearch --helpapi
 
 ## Add search functionality to your site
 
-StaticSearch provides a [web component](https://publican.dev/tools/staticsearch/search-web-component/) to enable search facilities. Add the following snippet to your static site template, perhaps in the HTML `<header>`:
+StaticSearch provides four ways to add a search facility on your site. The easiest is a single `<script>` tag placed inside your pages perhaps in the HTML `<header>`:
 
 ```html
-<script type="module" src="/search/staticsearch-component.js"></script>
-
-<static-search title="press Ctrl+K to search">
-  <p>search</p>
-</static-search>
+<script type="module" src="/search/staticsearch-here.js"></script>
 ```
 
-Use any HTML element inside `<static-search>` to activate search when it's clicked. You can now rebuild your site to include the update and [re-run the indexer](#index-your-site) to ensure word indexes are up-to-date.
+This displays a icon in the script's location on the page that opens a search dialog when clicked.
+
+If necessary, you can now rebuild your site to include this update and [re-run the indexer](#index-your-site) to ensure word indexes are up-to-date.
 
 For full help, refer to:
 
+* [StaticSearch script](https://staticsearch.com/staticsearch-here/): adds search functionality with a single `<script>`
+
 * [StaticSearch web component](https://staticsearch.com/search-web-component/): provides full search functionality
 
-* [StaticSearch bind module](https://staticsearch.com/search-bind-module/): attach search functionality to HTML `<input>` and result elements
+* [StaticSearch bind module](https://staticsearch.com/search-bind-module/): attach search functionality to custom HTML `<input>` and result elements
 
 * [StaticSearch JavaScript search API](https://staticsearch.com/search-api/): create your own custom search functionality.

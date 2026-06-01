@@ -1,3 +1,4 @@
+import pkg from './package.json' with { type: 'json' };
 import process from 'node:process';
 import { readdir, readFile, cp } from 'node:fs/promises';
 import { join, resolve, dirname, extname, sep } from 'node:path';
@@ -23,7 +24,7 @@ class StaticSearch {
 
   // configuration defaults
   #agent = 'staticsearch';
-  #clientJS = ['staticsearch.js', 'staticsearch-bind.js', 'staticsearch-component.js'];
+  #clientJS = ['staticsearch.js', 'staticsearch-bind.js', 'staticsearch-component.js', 'staticsearch-here.js'];
   #wordIndexChars = 2;
   #JSONspacing = '';
 
@@ -78,6 +79,20 @@ class StaticSearch {
     const
       workingSearchDir = this.searchDir ? resolve(process.cwd(), this.searchDir) : resolve(workingBuildDir, './search'),
       workingStaticSite = resolve( '/', dirname( import.meta.url.replace(/^[^/]*\/+/, '') ) );
+
+    const logLine = '─'.repeat(53);
+
+    concol.log([
+      logLine,
+      '   ___ _        _   _    ___                  _    ',
+      '  / __| |_ __ _| |_(_)__/ __| ___ __ _ _ _ __| |_  ',
+      '  \\__ \\  _/ _` |  _| / _\\__ \\/ -_) _` | \'_/ _| \' \\ ',
+      '  |___/\\__\\__,_|\\__|_\\__|___/\\___\\__,_|_| \\__|_||_|',
+      '',
+      (`version ${ pkg.version } `).padStart(34, ' '),
+      '              https://staticsearch.com/',
+      '',
+    ], 2);
 
     concol.log(['StaticSearch indexing started', '', ['processing HTML files in', workingBuildDir], ['writing index data to', workingSearchDir], '' ], 1);
 
@@ -191,6 +206,8 @@ class StaticSearch {
       pageIndex = [],
       wordIndex = new Map();
 
+    let ssPresent = 0;
+
     // create search word indexes
     buildFile.forEach((page, idx) => {
 
@@ -239,6 +256,9 @@ class StaticSearch {
         });
 
       }
+
+      // StaticSearch client script found in at least one page
+      if (page.html.ssPresent) ssPresent += 1;
 
     });
 
@@ -355,6 +375,36 @@ class StaticSearch {
 
       ],
       1
+
+    );
+
+    // percentage of pages with staticsearch
+    const ssPercent = Math.round(ssPresent / buildFile.length * 100);
+
+    concol.log(
+
+      [
+
+        `StaticSearch client-side functionality${ ssPresent ? '' : ' NOT'} found`,
+        '',
+
+        [ 'indexed pages with search', ssPresent ],
+        [ 'site search availability', ssPercent, '%' ],
+
+        (
+          ssPercent > 50 ? '' :
+            `
+For options, see https://staticsearch.com/
+
+Example: put this code in every page where you want a search icon:
+<script type="module" src="${ workingSearchDir.replace(workingBuildDir, '') }/staticsearch-here.js"></script>
+`
+        ),
+
+        logLine,
+
+      ],
+      2
 
     );
 

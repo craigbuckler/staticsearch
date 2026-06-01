@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.8.0 - 2026-06-01](#080---2026-06-01)
+
+* add search to any page with a single `<script>` tag (`staticsearch-here.js`)
+* shorter search input debounce time
+* Esc closes the `<static-search>` dialog when search field is empty on Safari
+* minimum font size of 16px when none is specified
+* "powered by" link in `<static-search>` dialog (removable in CSS)
+* improved logging with detection of client-side StaticSearch scripts
+
+
 ## [0.7.0 - 2026-04-14](#070---2026-04-14)
 
 * tries to find build directory at ./build, ./dist, ./dest, ./out, ./target, then ./
