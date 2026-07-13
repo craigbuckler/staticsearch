@@ -341,6 +341,7 @@ class StaticSearch {
           .replaceAll('__SSDIR__/', '')
           .replaceAll('__STEMFILE__', stemImport)
           .replaceAll('__AGENT__', this.#agent)
+          .replaceAll('__RELEASE__', pkg.version)
           .replaceAll('__FILENAME__', jsFile)
           .replaceAll('__VERSION__', version)
           .replaceAll('__WORDCROP__', this.wordCrop);

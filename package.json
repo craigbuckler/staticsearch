@@ -1,6 +1,6 @@
 {
   "name": "staticsearch",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Simple static site search system.",
   "type": "module",
   "main": "index.js",
@@ -16,6 +16,9 @@
     "index.js",
     "indexer.js"
   ],
+  "engines": {
+    "node": ">= 22.0.0"
+  },
   "keywords": [
     "static",
     "site",
@@ -48,11 +51,14 @@
   },
   "dependencies": {
     "concol": "2.1.1",
-    "node-html-parser": "7.1.0",
+    "node-html-parser": "9.0.0",
     "perfpro": "0.2.0"
   },
   "devDependencies": {
-    "esbuild": "0.28.0",
+    "esbuild": "0.28.1",
     "pixdb": "1.0.2"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true
   }
 }

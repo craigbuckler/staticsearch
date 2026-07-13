@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.8.1 - 2027-07-13](#081---2027-07-13)
+
+* `::part(activate)` element inherits color by default
+* version shown in "powered by" footer
+* set minimum Node.js engine (>= 22)
+* module updates
+* minor bug fixes
+
 ## [0.8.0 - 2026-06-01](#080---2026-06-01)
 
 * add search to any page with a single `<script>` tag (`staticsearch-here.js`)
