@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.0 - 2027-07-27](#090---2027-07-27)
+
+* new `--indexext` option sets full or partial extension name of indexed HTML files
+* parses `<meta name="keywords" content="...">` tags
+* zero-weight words are not indexed
+* compound words with hyphens, underscores, or apostrophes are converted to single word: *"co-worker's"* is indexed as *"coworkers"*
+
 ## [0.8.1 - 2027-07-13](#081---2027-07-13)
 
 * `::part(activate)` element inherits color by default
@@ -21,7 +28,7 @@
 ## [0.7.0 - 2026-04-14](#070---2026-04-14)
 
 * tries to find build directory at ./build, ./dist, ./dest, ./out, ./target, then ./
-* new `ignorestopdefault` option omits default stop words for language
+* new `--ignorestopdefault` option omits default stop words for language
 * `<static-search>` component is keyboard focusable
 * any element with a `data-static-search="search"` attribute triggers the `<static-search>` dialog
 * new partial word search and `fuzzy` configuration attribute
