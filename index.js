@@ -15,7 +15,8 @@ const
     { env: 'SEARCH_DIR',            cli: 'searchdir',         clis: 's',    prop: 'searchDir',              type: 'path',         default: './build/search/',   help: 'index file directory' },
     { env: 'SITE_DOMAIN',           cli: 'domain',            clis: 'd',    prop: 'siteDomain',             type: 'domain',       default: 'http://localhost',  help: 'site domain if links use full URL' },
     { env: 'BUILD_ROOT',            cli: 'root',              clis: 'r',    prop: 'buildRoot',              type: 'path',         default: '/',                 help: 'site root path' },
-    { env: 'SITE_INDEXFILE',        cli: 'indexfile',         clis: 'i',    prop: 'siteIndexFile',          type: 'name',         default: 'index.html',        help: 'default index file' },
+    { env: 'SITE_INDEXEXT',         cli: 'indexext',          clis: 'x',    prop: 'siteIndexExt',           type: 'str',          default: '.htm',              help: 'indexed file extension contains' },
+    { env: 'SITE_INDEXFILE',        cli: 'indexfile',         clis: 'i',    prop: 'siteIndexFile',          type: 'name',         default: 'index.html',        help: 'default index file name' },
     { env: 'SITE_PARSEROBOTSFILE',  cli: 'ignorerobotfile',   clis: 'f',    prop: 'siteParseRobotsFile',    type: 'true|false',   default: true,                help: 'parse robot.txt Disallows' },
     { env: 'SITE_PARSEROBOTSMETA',  cli: 'ignorerobotmeta',   clis: 'm',    prop: 'siteParseRobotsMeta',    type: 'true|false',   default: true,                help: 'parse robot meta noindex' },
     { env: 'PAGE_DOMSELECTORS',     cli: 'dom',               clis: 'D',    prop: 'pageDOMSelectors',       type: 'str',          default: '',                  help: 'CSS selector: nodes to include' },
@@ -27,6 +28,7 @@ const
     { env: 'WEIGHT_LINK',           cli: 'weightlink',        clis: '',     prop: 'wordWeight.link',        type: 'num',          default: 5,                   help: 'word weight for inbound links' },
     { env: 'WEIGHT_TITLE',          cli: 'weighttitle',       clis: '',     prop: 'wordWeight.title',       type: 'num',          default: 10,                  help: 'word weight for main title' },
     { env: 'WEIGHT_DESCRIPTION',    cli: 'weightdesc',        clis: '',     prop: 'wordWeight.description', type: 'num',          default: 8,                   help: 'word weight for description' },
+    { env: 'WEIGHT_KEYWORDS',       cli: 'weightkeywords',    clis: '',     prop: 'wordWeight.keywords',    type: 'num',          default: 1,                   help: 'word weight for meta keywords' },
     { env: 'WEIGHT_H2',             cli: 'weighth2',          clis: '',     prop: 'wordWeight.h2',          type: 'num',          default: 6,                   help: 'word weight for H2 headings' },
     { env: 'WEIGHT_H3',             cli: 'weighth3',          clis: '',     prop: 'wordWeight.h3',          type: 'num',          default: 5,                   help: 'word weight for H3 headings' },
     { env: 'WEIGHT_H4',             cli: 'weighth4',          clis: '',     prop: 'wordWeight.h4',          type: 'num',          default: 4,                   help: 'word weight for H4 headings' },
@@ -230,14 +232,13 @@ config.forEach(c => {
       value = parseFloat(value);
       break;
 
-    case 'str':
-      value = value.trim();
-      break;
-
     case 'true|false':
       value = String(value).trim().toLowerCase() !== 'false';
       if (opt[c.cli] && c.cli.startsWith('ignore')) value = !value;
       break;
+
+    default:
+      value = String(value).trim();
 
     }
 

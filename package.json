@@ -1,7 +1,7 @@
 {
   "name": "staticsearch",
-  "version": "0.8.1",
-  "description": "Simple static site search system.",
+  "version": "0.9.0",
+  "description": "A simpler search engine for static sites. Zero configuration for all Static Site Generators. No server or database required.",
   "type": "module",
   "main": "index.js",
   "exports": "./indexer.js",
@@ -22,11 +22,15 @@
   "keywords": [
     "static",
     "site",
+    "client-side",
+    "JavaScript",
+    "serverless",
     "search",
     "engine",
     "find",
     "index",
-    "query"
+    "query",
+    "JAMstack"
   ],
   "homepage": "https://github.com/craigbuckler/staticsearch#readme",
   "bugs": {

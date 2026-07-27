@@ -32,6 +32,7 @@ class StaticSearch {
   searchDir = env('SEARCH_DIR');
   buildRoot = env('BUILD_ROOT', '/');
   siteDomain = env('SITE_DOMAIN', 'http://localhost');
+  siteIndexExt = env('SITE_INDEXEXT', '.htm');
   siteIndexFile = env('SITE_INDEXFILE', 'index.html');
 
   siteParseRobotsFile = (env('SITE_PARSEROBOTSFILE', 'true').toLowerCase() !== 'false');
@@ -48,6 +49,7 @@ class StaticSearch {
   wordWeight = {
     title:        env('WEIGHT_TITLE', 10),
     description:  env('WEIGHT_DESCRIPTION', 8),
+    keywords:     env('WEIGHT_KEYWORDS', 1),
     h2:           env('WEIGHT_H2', 6),
     h3:           env('WEIGHT_H3', 5),
     h4:           env('WEIGHT_H4', 4),
@@ -80,7 +82,10 @@ class StaticSearch {
       workingSearchDir = this.searchDir ? resolve(process.cwd(), this.searchDir) : resolve(workingBuildDir, './search'),
       workingStaticSite = resolve( '/', dirname( import.meta.url.replace(/^[^/]*\/+/, '') ) );
 
-    const logLine = '─'.repeat(53);
+    // file extension match
+    const
+      extMatch = (this.siteIndexExt || '.htm').trim().toLowerCase(),
+      logLine = '─'.repeat(53);
 
     concol.log([
       logLine,
@@ -94,7 +99,7 @@ class StaticSearch {
       '',
     ], 2);
 
-    concol.log(['StaticSearch indexing started', '', ['processing HTML files in', workingBuildDir], ['writing index data to', workingSearchDir], '' ], 1);
+    concol.log(['StaticSearch indexing started', '', [`processing ${ extMatch } files in`, workingBuildDir], ['writing index data to', workingSearchDir], '' ], 1);
 
     // set language, stem and stopword
     this.language = (this.language || 'en').trim().toLowerCase();
@@ -121,7 +126,7 @@ class StaticSearch {
 
     // find all HTML files
     let buildFile = (await readdir(workingBuildDir, { recursive: true }))
-      .filter(f => extname(f).toLowerCase().includes('.htm'));
+      .filter(f => extname(f).toLowerCase().includes( extMatch ));
 
     // record total number of HTML files
     const totalHTMLfiles = buildFile.length;
@@ -155,7 +160,7 @@ class StaticSearch {
     // read and parse HTML files but remove any with:
     // <meta name="robots" content="noindex">
     // <meta name="staticsearch" content="noindex">
-    perf.mark('HTML file parsing');
+    perf.mark('HTML parsing');
     const robotRe = new RegExp(`<head.+<meta[^>]*name=[^>]*(robots|${ this.#agent })[^>]*noindex.+</head>`, 'is');
 
     (await Promise.allSettled(
@@ -198,7 +203,7 @@ class StaticSearch {
     // sort by slug
     buildFile.sort((a, b) => a.slug > b.slug ? 1 : -1);
 
-    perf.mark('HTML file parsing');
+    perf.mark('HTML parsing');
     perf.mark('word score calculations');
 
     const
@@ -224,6 +229,9 @@ class StaticSearch {
       // description scores
       addWords( page.html.word.description, idx, this.wordWeight.description );
 
+      // keywords scores
+      addWords( page.html.word.keywords, idx, this.wordWeight.keywords );
+
       // content scores
       addWords( page.html.word.content, idx, this.wordWeight.content );
 
@@ -246,6 +254,9 @@ class StaticSearch {
 
       // add words to wordScore
       function addWords( words, pageIndex, score ) {
+
+        // do not index zero-weight words
+        if (score <= 0) return;
 
         words.forEach(word => {
 
@@ -361,9 +372,9 @@ class StaticSearch {
       [
         'StaticSearch indexing complete\n',
 
-        [ 'HTML files found', totalHTMLfiles ],
-        [ 'HTML files excluded', totalHTMLfiles - pageIndex.length ],
-        [ 'HTML files indexed', pageIndex.length ],
+        [ `${ extMatch } files found`, totalHTMLfiles ],
+        [ `${ extMatch } files excluded`, totalHTMLfiles - pageIndex.length ],
+        [ `${ extMatch } files indexed`, pageIndex.length ],
         [ 'unique words indexed', wordIndex.size ],
         [ 'index files created', wordFileList.length + 1 ],
 
