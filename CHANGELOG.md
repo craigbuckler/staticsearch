@@ -1,19 +1,29 @@
 # Changelog
 
-## [0.9.0 - 2027-07-27](#090---2027-07-27)
+## [0.9.1 - 2026-08-19](#091---2026-08-19)
+
+* shorter `fetch` timeout handler
+* minor bug fixes
+* module updates
+* updated README.md
+
+
+## [0.9.0 - 2026-07-27](#090---2026-07-27)
 
 * new `--indexext` option sets full or partial extension name of indexed HTML files
 * parses `<meta name="keywords" content="...">` tags
 * zero-weight words are not indexed
-* compound words with hyphens, underscores, or apostrophes are converted to single word: *"co-worker's"* is indexed as *"coworkers"*
+* converts compound words with hyphens, underscores, or apostrophes to a single word: *"co-worker's"* becomes *"coworkers"* in the index
 
-## [0.8.1 - 2027-07-13](#081---2027-07-13)
+
+## [0.8.1 - 2026-07-13](#081---2026-07-13)
 
 * `::part(activate)` element inherits color by default
 * version shown in "powered by" footer
 * set minimum Node.js engine (>= 22)
 * module updates
 * minor bug fixes
+
 
 ## [0.8.0 - 2026-06-01](#080---2026-06-01)
 

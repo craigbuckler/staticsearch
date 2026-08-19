@@ -293,14 +293,9 @@ class StaticSearch {
 
     try {
 
-      const
-        controller = new AbortController(),
-        timer = setTimeout(() => controller.abort(), this.fetchTimeout),
-        res = await fetch(uri, {
-          signal: controller.signal
-        });
-
-      clearTimeout(timer);
+      const res = await fetch(uri, {
+        signal: AbortSignal.timeout(this.fetchTimeout)
+      });
 
       if (!res.ok) throw new Error(`Fetch failed ${ uri }: ${ res.status }`);
 

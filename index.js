@@ -68,7 +68,7 @@ try {
   const { values, positionals } = parseArgs({ args, options, strict: true, allowPositionals: true });
 
   // set build directory to first positional argument
-  if (positionals.length == 1 && !values.builddir) values.builddir = positionals[0];
+  if (positionals.length === 1 && !values.builddir) values.builddir = positionals[0];
 
   opt = { ...values };
 

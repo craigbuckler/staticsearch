@@ -41,7 +41,7 @@ class StaticSearch {
   pageDOMSelectors = env('PAGE_DOMSELECTORS', '');
   pageDOMExclude = env('PAGE_DOMEXCLUDE', '');
 
-  language = env('LOCALE');
+  language = env('LANGUAGE');
   wordCrop = env('WORDCROP');
   stopWords = env('STOPWORDS');
   stopWordsDefault = (env('STOPWORDS_DEFAULT', 'true').toLowerCase() !== 'false');
@@ -345,7 +345,7 @@ class StaticSearch {
     const stemImport = await stemFilename(wSearchDirStem, this.language);
 
     // copy and modify client code
-    Promise.allSettled(
+    await Promise.allSettled(
       this.#clientJS.map( async jsFile => {
 
         const clientJS = (await readFile( join(workingStaticSite, './dist/js/', jsFile), { encoding: 'utf8' } ))

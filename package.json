@@ -1,7 +1,7 @@
 {
   "name": "staticsearch",
-  "version": "0.9.0",
-  "description": "A simpler search engine for static sites. Zero configuration for all Static Site Generators. No server or database required.",
+  "version": "0.9.1",
+  "description": "A fast, modern client-side search engine for static sites using prebuilt page indexes and zero configuration.",
   "type": "module",
   "main": "index.js",
   "exports": "./indexer.js",
@@ -22,15 +22,22 @@
   "keywords": [
     "static",
     "site",
+    "jamstack",
+    "blog",
+    "documentation",
+    "html",
+    "web",
+    "page",
     "client-side",
-    "JavaScript",
+    "javascript",
     "serverless",
-    "search",
-    "engine",
-    "find",
+    "full",
+    "text",
     "index",
+    "find",
     "query",
-    "JAMstack"
+    "search",
+    "engine"
   ],
   "homepage": "https://github.com/craigbuckler/staticsearch#readme",
   "bugs": {
@@ -55,14 +62,14 @@
   },
   "dependencies": {
     "concol": "2.1.1",
-    "node-html-parser": "9.0.0",
+    "node-html-parser": "9.0.1",
     "perfpro": "0.2.0"
   },
   "devDependencies": {
-    "esbuild": "0.28.1",
+    "esbuild": "0.28.2",
     "pixdb": "1.0.2"
   },
   "allowScripts": {
-    "esbuild@0.28.1": true
+    "esbuild": true
   }
 }
